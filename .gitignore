@@ -1,3 +1,61 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =========================
+# Ambientes virtuais
+# =========================
+
+.venv/
+venv/
+env/
+
+# =========================
+# Variáveis de ambiente
+# =========================
+
+.env
+.env.*
+
+# =========================
+# Playwright / Browser Profiles
+# =========================
+
+profiles/*
+!profiles/.gitkeep
+
+# =========================
+# Testes / arquivos temporários
+# =========================
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Downloads / Screenshots
+# =========================
+
+downloads/
+screenshots/
+
+# =========================
+# IDE
+# =========================
+
+.vscode/
+.idea/
+
+# =========================
+# Sistema operacional
+# =========================
+
+.DS_Store
+Thumbs.db
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
