@@ -1,173 +1,18 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any, Callable, Optional
 
 from playwright.sync_api import Page
 
 from app.engine.element_resolver import ElementResolver, Match
 
-
-# Ação do Executor → ação correspondente passada para
-# ElementResolver.query().
-RESOLVER_ACTION_MAP = {
-    "click": "click",
-    "hover": "click",
-    "check": "click",
-    "uncheck": "click",
-    "press": "click",
-    "fill": "fill",
-    "select": "fill",
-    "extract_text": "extract",
-    "extract_attribute": "extract",
-    "extract_value": "extract",
-}
-
-
-# Score mínimo do melhor candidato para considerar
-# a resolução confiável.
-DEFAULT_MIN_SCORE = 0.20
-
-
-# Diferença mínima entre o primeiro e o segundo candidato
-# para considerar a escolha suficientemente clara.
-#
-# Exemplo:
-#
-# 0.79
-# 0.74
-#
-# gap = 0.05
-#
-# Como 0.05 < 0.08, a ação será considerada ambígua.
-DEFAULT_AMBIGUITY_GAP = 0.08
-
-
-# Quantidade máxima de candidatos analisados pelo Executor.
-DEFAULT_K = 5
-
-
-@dataclass
-class ActionResult:
-    """
-    Resultado estruturado de uma ação do ActionExecutor.
-
-    status:
-
-        success
-            A ação foi executada com sucesso.
-
-        ambiguous
-            Existem candidatos com scores muito próximos.
-            Nenhuma ação foi executada.
-
-        not_found
-            Nenhum candidato confiável foi encontrado.
-
-        error
-            Um candidato foi selecionado, mas a execução
-            da ação falhou.
-    """
-
-    status: str
-    action: str
-    description: str
-
-    selected_element: Optional[Match] = None
-    score: Optional[float] = None
-    value: Optional[Any] = None
-    candidates: Optional[list[Match]] = None
-    error: Optional[str] = None
-
-    def __bool__(self) -> bool:
-        """
-        Permite utilizar:
-
-            if result:
-                ...
-
-        O resultado só é considerado verdadeiro quando
-        a ação foi executada com sucesso.
-        """
-
-        return self.status == "success"
-
-    def raise_if_error(self) -> "ActionResult":
-        """
-        Levanta ActionExecutionError caso a ação
-        não tenha sido executada com sucesso.
-        """
-
-        if self.status != "success":
-            raise ActionExecutionError(self)
-
-        return self
-
-    def __repr__(self) -> str:
-
-        if self.status == "success":
-
-            element = self.selected_element
-
-            label = (
-                element.label or element.text
-                if element
-                else ""
-            )
-
-            return (
-                f"ActionResult("
-                f"status='success', "
-                f"action='{self.action}', "
-                f"score={self.score:.2f}, "
-                f"element='{label}'"
-                f")"
-            )
-
-        if self.status == "ambiguous":
-
-            scores = ", ".join(
-                f"{candidate.score:.2f}"
-                for candidate in (self.candidates or [])[:3]
-            )
-
-            return (
-                f"ActionResult("
-                f"status='ambiguous', "
-                f"action='{self.action}', "
-                f"candidates=[{scores}]"
-                f")"
-            )
-
-        if self.status == "error":
-
-            return (
-                f"ActionResult("
-                f"status='error', "
-                f"action='{self.action}', "
-                f"error='{self.error}'"
-                f")"
-            )
-
-        return (
-            f"ActionResult("
-            f"status='not_found', "
-            f"action='{self.action}', "
-            f"description='{self.description}'"
-            f")"
-        )
-
-
-class ActionExecutionError(Exception):
-    """
-    Exceção levantada por ActionResult.raise_if_error().
-    """
-
-    def __init__(self, result: ActionResult):
-
-        self.result = result
-
-        super().__init__(repr(result))
+from .constants import (
+    DEFAULT_AMBIGUITY_GAP,
+    DEFAULT_K,
+    DEFAULT_MIN_SCORE,
+    RESOLVER_ACTION_MAP,
+)
+from .result import ActionResult
 
 
 class ActionExecutor:
@@ -213,10 +58,6 @@ class ActionExecutor:
         self.ambiguity_gap = ambiguity_gap
         self.k = k
 
-    # ---------------------------------------------------------
-    # Resolução
-    # ---------------------------------------------------------
-
     def _resolve(
         self,
         description: str,
@@ -226,24 +67,6 @@ class ActionExecutor:
         Optional[Match],
         Optional[list[Match]],
     ]:
-        """
-        Consulta o ElementResolver e decide se existe
-        um candidato seguro para executar.
-
-        Retorna:
-
-            (
-                status,
-                elemento_selecionado,
-                candidatos
-            )
-
-        status pode ser:
-
-            success
-            ambiguous
-            not_found
-        """
 
         matches = self.resolver.query(
             description,
@@ -251,7 +74,6 @@ class ActionExecutor:
             action=resolver_action,
         )
 
-        # Nenhum candidato ou score insuficiente.
         if (
             not matches
             or matches[0].score < self.min_score
@@ -262,7 +84,6 @@ class ActionExecutor:
                 matches,
             )
 
-        # Apenas um candidato confiável.
         if len(matches) == 1:
             return (
                 "success",
@@ -270,14 +91,11 @@ class ActionExecutor:
                 matches,
             )
 
-        # Verifica a diferença entre o primeiro
-        # e o segundo candidato.
         gap = (
             matches[0].score
             - matches[1].score
         )
 
-        # Os candidatos estão próximos demais.
         if gap < self.ambiguity_gap:
             return (
                 "ambiguous",
@@ -285,17 +103,11 @@ class ActionExecutor:
                 matches,
             )
 
-        # Primeiro candidato suficientemente acima
-        # do segundo.
         return (
             "success",
             matches[0],
             matches,
         )
-
-    # ---------------------------------------------------------
-    # Execução genérica
-    # ---------------------------------------------------------
 
     def _run(
         self,
@@ -314,12 +126,7 @@ class ActionExecutor:
             resolver_action,
         )
 
-        # -----------------------------------------------------
-        # Elemento não encontrado
-        # -----------------------------------------------------
-
         if status == "not_found":
-
             return ActionResult(
                 status="not_found",
                 action=action_name,
@@ -327,12 +134,7 @@ class ActionExecutor:
                 candidates=candidates,
             )
 
-        # -----------------------------------------------------
-        # Elemento ambíguo
-        # -----------------------------------------------------
-
         if status == "ambiguous":
-
             return ActionResult(
                 status="ambiguous",
                 action=action_name,
@@ -340,17 +142,12 @@ class ActionExecutor:
                 candidates=candidates,
             )
 
-        # -----------------------------------------------------
-        # Execução
-        # -----------------------------------------------------
         assert match is not None
 
         try:
-
             value = fn(match)
 
         except Exception as exc:
-
             return ActionResult(
                 status="error",
                 action=action_name,
@@ -360,10 +157,6 @@ class ActionExecutor:
                 error=str(exc),
             )
 
-        # -----------------------------------------------------
-        # Sucesso
-        # -----------------------------------------------------
-
         return ActionResult(
             status="success",
             action=action_name,
@@ -372,10 +165,6 @@ class ActionExecutor:
             score=match.score,
             value=value,
         )
-
-    # ---------------------------------------------------------
-    # Interação
-    # ---------------------------------------------------------
 
     def click(
         self,
@@ -473,40 +262,22 @@ class ActionExecutor:
         index: Optional[int] = None,
         **kwargs,
     ) -> ActionResult:
-        """
-        Seleciona uma opção de um <select>.
-
-        Pode receber:
-
-            value="valor"
-
-        ou:
-
-            label="Texto"
-
-        ou:
-
-            index=0
-        """
 
         def _select(match: Match):
 
             if value is not None:
-
                 return match.locator.select_option(
                     value=value,
                     **kwargs,
                 )
 
             if label is not None:
-
                 return match.locator.select_option(
                     label=label,
                     **kwargs,
                 )
 
             if index is not None:
-
                 return match.locator.select_option(
                     index=index,
                     **kwargs,
@@ -521,10 +292,6 @@ class ActionExecutor:
             "select",
             _select,
         )
-
-    # ---------------------------------------------------------
-    # Extração
-    # ---------------------------------------------------------
 
     def extract_text(
         self,
