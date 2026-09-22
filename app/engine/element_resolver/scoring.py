@@ -2,6 +2,9 @@ from .constants import (
     ACTION_CONTENT_BONUS,
     ACTION_MISMATCH_DAMPING,
     ACTION_ROLE_WEIGHTS,
+    OBJECT_CONTEXT_BONUS,
+    OBJECT_MISMATCH_DAMPING,
+    EXTRACT_TEXT_BONUS,
 )
 from .tokenizer import (
     normalize_tokens,
@@ -122,10 +125,10 @@ def score_element(
         )
 
         if object_coverage == 0.0:
-            score *= 0.50
+            score *= OBJECT_MISMATCH_DAMPING
 
         else:
-            score += object_coverage * 0.35
+            score += object_coverage * OBJECT_CONTEXT_BONUS
 
             if object_coverage == 1.0:
                 score += 0.20
@@ -176,6 +179,11 @@ def score_element(
         "radio",
         "combobox",
         "listbox",
+        "tab",
+        "switch",
+        "menuitem",
+        "option",
+        "spinbutton",
     }
 
     if role in interactive_roles:
@@ -260,7 +268,7 @@ def score_element(
 
         score += (
             text_coverage
-            * 0.30
+            * EXTRACT_TEXT_BONUS
         )
 
         normalized_text = " ".join(

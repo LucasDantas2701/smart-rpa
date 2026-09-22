@@ -34,16 +34,17 @@ class ActionResult:
         return self
 
     def __repr__(self) -> str:
-        # resto igual
-        ...
         if self.status == "success":
             element = self.selected_element
 
-            label = (
-                element.label or element.text
-                if element
-                else ""
-            )
+            if element:
+                label = (
+                    element.label
+                    or element.text
+                    or f"{element.tag}#{element.id}"
+                )
+            else:
+                label = ""
 
             return (
                 f"ActionResult("

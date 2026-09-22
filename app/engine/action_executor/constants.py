@@ -1,11 +1,11 @@
 RESOLVER_ACTION_MAP = {
     "click": "click",
     "hover": "click",
-    "check": "click",
-    "uncheck": "click",
+    "check": "check",       # antes: "click" — agora aproveita os pesos dedicados (checkbox/switch/radio)
+    "uncheck": "check",     # antes: "click" — uncheck usa o mesmo perfil de role que check
     "press": "click",
     "fill": "fill",
-    "select": "fill",
+    "select": "select",     # antes: "fill" — agora aproveita os pesos dedicados (option/combobox/listbox)
     "extract_text": "extract",
     "extract_attribute": "extract",
     "extract_value": "extract",
