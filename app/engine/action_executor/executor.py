@@ -4,6 +4,14 @@ from typing import Any, Callable, Optional
 
 from playwright.sync_api import Page
 
+from app.engine.disambiguation import (
+    ChoiceRequest,
+    Disambiguator,
+    capture_click,
+    clear_highlights,
+    describe,
+    highlight_candidates,
+)
 from app.engine.element_resolver import ElementResolver, Match
 
 from .constants import (
@@ -45,7 +53,21 @@ class ActionExecutor:
         min_score: float = DEFAULT_MIN_SCORE,
         ambiguity_gap: float = DEFAULT_AMBIGUITY_GAP,
         k: int = DEFAULT_K,
+        disambiguator: Optional[Disambiguator] = None,
+        can_point: bool = False,
+        max_choices: int = 5,
+        point_timeout_s: float = 120,
     ):
+        """
+        disambiguator:
+            Quem pergunta ao usuário quando a heurística recusa
+            (ambiguous / not_found). Sem ele, o Executor devolve a
+            recusa, como antes.
+
+        can_point:
+            True quando o navegador está visível (headed): o usuário
+            pode clicar direto no elemento.
+        """
         self.page = page
 
         self.resolver = (
@@ -57,6 +79,10 @@ class ActionExecutor:
         self.min_score = min_score
         self.ambiguity_gap = ambiguity_gap
         self.k = k
+        self.disambiguator = disambiguator
+        self.can_point = can_point
+        self.max_choices = max_choices
+        self.point_timeout_s = point_timeout_s
 
     def _resolve(
         self,
@@ -127,21 +153,32 @@ class ActionExecutor:
             resolver_action,
         )
 
-        if status == "not_found":
-            return ActionResult(
-                status="not_found",
-                action=action_name,
-                description=description,
-                candidates=candidates,
+        resolved_by = "heuristic"
+
+        if status in ("not_found", "ambiguous"):
+
+            if self.disambiguator is None:
+                return ActionResult(
+                    status=status,
+                    action=action_name,
+                    description=description,
+                    candidates=candidates,
+                )
+
+            match = self._ask_user(
+                description, action_name, status, candidates or []
             )
 
-        if status == "ambiguous":
-            return ActionResult(
-                status="ambiguous",
-                action=action_name,
-                description=description,
-                candidates=candidates,
-            )
+            if match is None:
+                return ActionResult(
+                    status=status,
+                    action=action_name,
+                    description=description,
+                    candidates=candidates,
+                    resolved_by="user_skipped",
+                )
+
+            resolved_by = "user"
 
         assert match is not None
 
@@ -156,6 +193,7 @@ class ActionExecutor:
                 selected_element=match,
                 score=match.score,
                 error=str(exc),
+                resolved_by=resolved_by,
             )
 
         return ActionResult(
@@ -165,7 +203,47 @@ class ActionExecutor:
             selected_element=match,
             score=match.score,
             value=value,
+            resolved_by=resolved_by,
         )
+
+    def _ask_user(
+        self,
+        description: str,
+        action_name: str,
+        reason: str,
+        candidates: list[Match],
+    ) -> Optional[Match]:
+        """Desempate: destaca os candidatos, pergunta e devolve a escolha."""
+
+        shown = candidates[: self.max_choices]
+
+        try:
+            highlight_candidates(self.page, shown)
+            screenshot = (
+                None if self.can_point
+                else self.page.screenshot(full_page=True)
+            )
+            choice = self.disambiguator.choose(ChoiceRequest(
+                action=action_name,
+                description=description,
+                reason=reason,
+                candidates=[describe(m, i) for i, m in enumerate(shown, 1)],
+                screenshot=screenshot,
+                can_point=self.can_point,
+            ))
+        finally:
+            clear_highlights(self.page)
+
+        if choice.kind == "candidate" and choice.number:
+            return shown[choice.number - 1]
+
+        if choice.kind == "point" and self.can_point:
+            self.disambiguator.notify(
+                "Clique no elemento na janela do navegador."
+            )
+            return capture_click(self.page, self.point_timeout_s)
+
+        return None
 
     def click(
         self,

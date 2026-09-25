@@ -24,6 +24,10 @@ class ActionResult:
     candidates: Optional[list[Match]] = None
     error: Optional[str] = None
 
+    # Quem escolheu o elemento: "heuristic", "user" (desempate)
+    # ou "user_skipped" (o usuário pediu para pular o passo).
+    resolved_by: str = "heuristic"
+
     def __bool__(self) -> bool:
         return self.status == "success"
 
@@ -52,7 +56,8 @@ class ActionResult:
                 f"action='{self.action}', "
                 f"score={self.score:.2f}, "
                 f"element='{label}'"
-                f")"
+                + (f", resolved_by='{self.resolved_by}'" if self.resolved_by != "heuristic" else "")
+                + f")"
             )
 
         if self.status == "ambiguous":
