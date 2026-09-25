@@ -1,8 +1,3 @@
-import re
-
-TOKEN_RE = re.compile(
-    r"[^a-z0-9à-ÿ]+"
-)
 # DEFAULT_SELECTOR removido: o index_script.js detecta os elementos sozinho.
 
 
@@ -158,6 +153,9 @@ SYNONYMS = {
     "feche": "close",
     "sair": "logout",
     "entrar": "login",
+    "sign in": "login",   # equivalências EN → EN também valem
+    "log in": "login",
+    "sign up": "signup",
     "acessar": "login",
     "cadastrar": "signup",
     "cadastre-se": "signup",
@@ -167,6 +165,8 @@ SYNONYMS = {
     "cancelar assinatura": "unsubscribe",
     "carregar mais": "load more",
     "ver mais": "view more",
+    "mostrar": "show",
+    "exibir": "show",
     "mostrar mais": "show more",
     "mostrar menos": "show less",
     "limpar": "clear",
@@ -185,8 +185,7 @@ SYNONYMS = {
     "salve": "save",
     "gravar": "save",
     "senha": "password",
-    "usuário": "username",
-    "usuario": "username",
+    "usuário": "user username",   # valores com espaço = vários sinônimos
     "e-mail": "email",
     "email": "email",
     "nome": "name",
@@ -196,6 +195,7 @@ SYNONYMS = {
     "telefone": "phone",
     "celular": "phone",
     "esqueci a senha": "forgot password",
+    "esqueci": "forgot",
     "lembrar de mim": "remember me",
     "verificar": "verify",
     "validar": "validate",
@@ -267,15 +267,6 @@ SYNONYMS = {
     "anexo": "attachment",
     "arquivo": "file",
     "documento": "document",
-
-    # produtos de exemplo (mantidos do original)
-    "mochila": "backpack",
-    "bicicleta": "bike",
-    "luz": "light",
-    "camisa": "shirt",
-    "jaqueta": "jacket",
-    "macacão": "onesie",
-    "macacao": "onesie",
 }
 
 

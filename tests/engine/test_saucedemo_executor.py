@@ -1,9 +1,22 @@
 import pytest
 
 from app.engine.action_executor import ActionExecutor
+from app.engine.element_resolver import ElementResolver
 
 
 SAUCEDEMO_URL = "https://www.saucedemo.com"
+
+# Vocabulário específico do site. Antes ficava no constants.py
+# (viés de overfitting); agora é passado ao Resolver, como será
+# feito com os dados de cada automação salva.
+SAUCEDEMO_VOCAB = {
+    "mochila": "backpack",
+    "lanterna": "light",
+    "bicicleta": "bike",
+    "camiseta": "shirt",
+    "jaqueta": "jacket",
+    "macacão": "onesie",
+}
 
 
 @pytest.fixture
@@ -46,6 +59,7 @@ def test_add_backpack_to_cart(saucedemo_page):
 
     executor = ActionExecutor(
         saucedemo_page,
+        resolver=ElementResolver(saucedemo_page, synonyms=SAUCEDEMO_VOCAB),
         ambiguity_gap=0.08,
     )
 
@@ -90,7 +104,7 @@ def test_find_backpack(saucedemo_page):
 def test_debug_backpack_candidates(saucedemo_page):
     from app.engine.element_resolver import ElementResolver
 
-    resolver = ElementResolver(saucedemo_page)
+    resolver = ElementResolver(saucedemo_page, synonyms=SAUCEDEMO_VOCAB)
 
     matches = resolver.query(
         "botão para adicionar a mochila ao carrinho",

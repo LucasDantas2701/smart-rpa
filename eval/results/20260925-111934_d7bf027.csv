@@ -1,0 +1,56 @@
+suite,case_id,split,action,query,status,rank,target_indexed,outcome,top1_score,runner_up_score,target_score,top1_is_target,top1_desc,n_indexed,ms
+cadastro,cad-01,dev,fill,nome completo,success,1,True,acerto,1.9,0.9,1.9,True,textbox 'Nome completo',16,19.6
+cadastro,cad-02,test,fill,preencher o CPF,success,1,True,acerto,0.7417,0.4917,0.7417,True,textbox 'CPF',16,10.2
+cadastro,cad-03,dev,fill,data de nascimento,success,1,True,acerto,1.9,1.05,1.9,True,textbox 'Data de nascimento',16,17.4
+cadastro,cad-04,test,fill,e-mail da empresa,success,1,True,acerto,0.8,0.5875,0.8,True,textbox 'E-mail corporativo',16,8.8
+cadastro,cad-05,dev,fill,telefone,success,1,True,acerto,1.9,0.9,1.9,True,textbox 'Telefone',16,8.9
+cadastro,cad-06,test,select,escolher o departamento,success,1,True,acerto,0.6929,0.4804,0.6929,True,combobox 'Departamento',16,8.5
+cadastro,cad-07,dev,check,contrato PJ,success,1,True,acerto,1.155,0.9,1.155,True,radio 'PJ',16,9.0
+cadastro,cad-08,test,fill,campo de observações,success,1,True,acerto,1.2,1.0,1.2,True,textbox 'Observações',16,8.1
+cadastro,cad-09,dev,check,aceitar os termos,success,1,True,acerto,0.9,0.35,0.9,True,checkbox 'Li e aceito os termos de uso',16,7.2
+cadastro,cad-10,test,click,salvar o cadastro,success,1,True,acerto,1.6917,0.5579,1.6917,True,button 'Salvar cadastro',16,7.6
+cadastro,cad-11,dev,click,cancelar,success,1,True,acerto,1.5,0.2875,1.5,True,button 'Cancelar',16,9.1
+cadastro,cad-12,test,click,imprimir a página,success,1,True,acerto,0.455,0.375,0.455,True,button 'Imprimir',16,8.4
+cadastro,cad-13,dev,click,baixar o formulário,success,1,True,acerto,0.6583,0.2279,0.6583,True,button 'download',16,8.1
+cadastro,cad-14,test,extract_text,data do último salvamento,ambiguous,3,True,recusa_correta,0.4167,0.3542,0.3158,False,textbox 'Data de nascimento',31,12.7
+login,login-01,dev,fill,campo de usuário,success,1,True,acerto,1.0667,0.8,1.0667,True,textbox 'Username',8,11.8
+login,login-02,test,fill,digitar a senha,success,1,True,acerto,0.6583,0.5667,0.6583,True,textbox 'Password',8,5.6
+login,login-03,dev,click,botão de entrar,success,1,True,acerto,0.7333,0.2692,0.7333,True,button 'Log in',8,6.5
+login,login-04,test,check,marcar lembrar de mim,success,1,True,acerto,0.205,0.055,0.205,True,checkbox 'Remember me',8,6.1
+login,login-05,dev,click,esqueci minha senha,ambiguous,2,True,recusa_correta,0.6167,0.5867,0.5867,False,button 'Show password',8,5.8
+login,login-06,test,click,criar uma conta nova,success,1,True,acerto,0.4742,0.3875,0.4742,True,link 'Create an account',8,5.3
+login,login-07,dev,click,mostrar a senha,success,2,True,erro_silencioso,0.7867,0.6583,0.6583,False,link 'Forgot your password?',8,6.9
+login,login-08,test,select,trocar o idioma,ambiguous,1,True,recusa_evitavel,0.2492,0.2092,0.2492,True,combobox 'Language',8,5.1
+loja,loja-01,dev,click,adicionar os fones de ouvido ao carrinho,ambiguous,2,True,recusa_correta,0.8167,0.8167,0.8167,False,button 'Add to cart',22,19.4
+loja,loja-02,test,click,colocar o UltraBook no carrinho,ambiguous,2,True,recusa_correta,0.6617,0.6417,0.6417,False,link 'UltraBook 14',22,10.3
+loja,loja-03,dev,click,abrir o carrinho,ambiguous,10,True,recusa_correta,0.6771,0.6771,0.3267,False,button 'Add to cart',22,11.2
+loja,loja-04,test,fill,campo de busca de produtos,ambiguous,1,True,recusa_evitavel,0.25,0.2,0.25,True,searchbox 'Search products',22,10.7
+loja,loja-05,dev,click,botão de pesquisar,success,1,True,acerto,0.7333,0.4667,0.7333,True,button 'Search',22,9.6
+loja,loja-06,test,click,favoritar a cafeteira,ambiguous,,True,recusa_correta,0.375,0.375,,False,link 'TechStore',22,8.3
+loja,loja-07,dev,click,entrar na minha conta,ambiguous,2,True,recusa_correta,0.205,0.205,0.205,False,button 'Search',22,10.5
+loja,loja-08,test,click,ver a categoria de áudio,ambiguous,,True,recusa_correta,0.333,0.333,,False,link 'TechStore',22,10.5
+loja,loja-09,dev,select,ordenar por preço,success,1,True,acerto,1.1367,0.3575,1.1367,True,combobox 'Sort by',22,9.7
+loja,loja-10,test,click,página de devoluções,ambiguous,,True,recusa_correta,0.25,0.25,,False,button 'Search',22,12.3
+loja,loja-11,dev,extract_text,preço do UltraBook 14,success,,True,erro_silencioso,0.8083,0.6333,,False,link 'UltraBook 14',29,13.2
+loja,loja-12,test,extract_text,nome do produto de fones,not_found,,True,recusa_correta,0.1,0.1,,False,link 'TechStore',29,11.3
+loja,loja-13,dev,click,abrir a lista de desejos,ambiguous,2,True,recusa_correta,0.2372,0.2372,0.2372,False,link 'TechStore',22,11.0
+saucedemo,sauce-01,dev,click,botão para adicionar a mochila ao carrinho,success,1,True,acerto,1.4964,1.0179,1.4964,True,button 'Add to cart',31,26.7
+saucedemo,sauce-02,test,click,adicionar a lanterna de bicicleta ao carrinho,success,1,True,acerto,1.0726,0.856,1.0726,True,button 'Add to cart',31,12.0
+saucedemo,sauce-03,test,click,adicionar a camiseta vermelha,ambiguous,3,True,recusa_correta,0.6594,0.6594,0.6594,False,button 'Add to cart',31,15.9
+saucedemo,sauce-04,dev,click,abrir o carrinho,ambiguous,,True,recusa_correta,0.6771,0.6771,,False,button 'Add to cart',31,11.6
+saucedemo,sauce-05,test,click,abrir o menu lateral,success,1,True,acerto,0.7381,0.2892,0.7381,True,button 'Open Menu',31,12.5
+saucedemo,sauce-06,dev,select,ordenar produtos por preço,success,1,True,acerto,0.7575,0.2406,0.7575,True,combobox 'Sort products',31,14.1
+saucedemo,sauce-07,dev,extract_text,Sauce Labs Backpack,success,1,True,acerto,2.5,2.35,2.5,True,button 'Sauce Labs Backpack',54,24.7
+saucedemo,sauce-08,test,extract_text,preço da jaqueta,ambiguous,7,True,recusa_correta,0.5167,0.4667,0.3167,False,button 'Sauce Labs Fleece Jacket',56,28.3
+usuarios,usr-01,dev,click,editar o usuário Bruno Lima,success,1,True,acerto,0.925,0.6305,0.925,True,button 'Editar',16,15.5
+usuarios,usr-02,test,click,excluir a Carla Mendes,success,1,True,acerto,1.2687,0.7222,1.2687,True,button 'Excluir',16,7.9
+usuarios,usr-03,dev,click,apagar o usuário da Ana,success,1,True,acerto,0.795,0.5955,0.795,True,button 'Excluir',16,9.9
+usuarios,usr-04,test,check,selecionar o Bruno,success,1,True,acerto,1.6417,0.6842,1.6417,True,checkbox 'Selecionar Bruno Lima',16,9.1
+usuarios,usr-05,dev,check,selecionar todos os usuários,success,2,True,erro_silencioso,0.9312,0.8294,0.8294,False,combobox 'Filtrar por status',16,9.3
+usuarios,usr-06,test,fill,pesquisar usuário,success,1,True,acerto,1.7625,0.505,1.7625,True,textbox 'Pesquisar usuários',16,7.1
+usuarios,usr-07,dev,select,filtrar por status,success,1,True,acerto,1.28,0.4375,1.28,True,combobox 'Filtrar por status',16,7.2
+usuarios,usr-08,test,click,cadastrar novo usuário,success,1,True,acerto,0.81,0.535,0.81,True,button '+ Novo usuário',16,9.0
+usuarios,usr-09,dev,click,exportar para excel,success,1,True,acerto,0.66,0.25,0.66,True,button 'Exportar planilha',16,8.3
+usuarios,usr-10,test,click,ir para a próxima página,success,1,True,acerto,0.96,0.3675,0.96,True,link 'Próxima',16,7.2
+usuarios,usr-11,dev,extract_text,e-mail do Bruno Lima,ambiguous,3,True,recusa_correta,0.6983,0.6333,0.4717,False,checkbox 'Selecionar Bruno Lima',31,12.2
+usuarios,usr-12,test,extract_text,status da Carla Mendes,ambiguous,7,True,recusa_correta,0.7333,0.7083,0.275,False,checkbox 'Selecionar Carla Mendes',31,11.6

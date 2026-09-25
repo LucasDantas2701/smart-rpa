@@ -1,0 +1,27 @@
+{
+  "commit": "d7bf027",
+  "data": "2026-09-25T11:19:34",
+  "filtros": {
+    "split": null,
+    "site": null,
+    "offline": false
+  },
+  "limiares": {
+    "min_score": 0.2,
+    "gap": 0.08
+  },
+  "geral": {
+    "n": 55,
+    "recall@1": 0.6545454545454545,
+    "recall@3": 0.8363636363636363,
+    "recall@5": 0.8363636363636363,
+    "recall@10": 0.8909090909090909,
+    "mrr": 0.7433766233766234,
+    "acerto": 0.6181818181818182,
+    "erro_silencioso": 0.05454545454545454,
+    "recusa_evitavel": 0.03636363636363636,
+    "recusa_correta": 0.2909090909090909,
+    "falha_percepcao": 0.0,
+    "ms_medio": 10.996363636363636
+  }
+}

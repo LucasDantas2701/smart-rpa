@@ -7,7 +7,9 @@ from .constants import (
     EXTRACT_TEXT_BONUS,
 )
 from .tokenizer import (
+    normalize_text,
     normalize_tokens,
+    stem,
     tokenize,
 )
 
@@ -24,6 +26,7 @@ def score_element(
     role: str,
     tag: str,
     action: str | None = None,
+    synonyms: dict[str, set[str]] | None = None,
 ) -> float:
     """
     Calcula a relevância de um elemento
@@ -35,15 +38,22 @@ def score_element(
 
     score = 0.0
 
+    # Mesmo espaço da consulta: minúsculas, sem acentos, expressões compostas.
+    content = normalize_text(content)
+    context = normalize_text(context)
+    text = normalize_text(text)
+
     content_tokens = tokenize(content)
     context_tokens = tokenize(context)
 
     normalized_content_tokens = normalize_tokens(
-        content_tokens
+        content_tokens,
+        synonyms,
     )
 
     normalized_context_tokens = normalize_tokens(
-        context_tokens
+        context_tokens,
+        synonyms,
     )
 
     # -------------------------------------------------
@@ -161,10 +171,10 @@ def score_element(
     # 5. Correspondência do tipo de elemento.
     # -------------------------------------------------
 
-    if role in normalized_query_tokens:
+    if stem(role) in normalized_query_tokens:
         score += 0.05
 
-    elif tag in normalized_query_tokens:
+    elif stem(tag) in normalized_query_tokens:
         score += 0.05
 
     # -------------------------------------------------
@@ -256,7 +266,8 @@ def score_element(
     if action == "extract" and normalized_query_tokens:
 
         normalized_text_tokens = normalize_tokens(
-            tokenize(text)
+            tokenize(text),
+            synonyms,
         )
 
         text_hits = (

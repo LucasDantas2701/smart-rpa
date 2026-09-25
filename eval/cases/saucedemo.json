@@ -4,14 +4,69 @@
   "setup": "saucedemo_login",
   "requires_network": true,
   "description": "Site real (SauceDemo), exige internet",
+  "synonyms": {
+    "mochila": "backpack",
+    "lanterna": "light",
+    "bicicleta": "bike",
+    "camiseta": "shirt",
+    "jaqueta": "jacket"
+  },
   "cases": [
-    {"id": "sauce-01", "split": "dev",  "action": "click", "query": "botão para adicionar a mochila ao carrinho", "expected": "[data-test='add-to-cart-sauce-labs-backpack']"},
-    {"id": "sauce-02", "split": "test", "action": "click", "query": "adicionar a lanterna de bicicleta ao carrinho", "expected": "[data-test='add-to-cart-sauce-labs-bike-light']"},
-    {"id": "sauce-03", "split": "test", "action": "click", "query": "adicionar a camiseta vermelha", "expected": "[data-test='add-to-cart-test.allthethings()-t-shirt-(red)']"},
-    {"id": "sauce-04", "split": "dev",  "action": "click", "query": "abrir o carrinho", "expected": "[data-test='shopping-cart-link']"},
-    {"id": "sauce-05", "split": "test", "action": "click", "query": "abrir o menu lateral", "expected": "#react-burger-menu-btn"},
-    {"id": "sauce-06", "split": "dev",  "action": "select", "query": "ordenar produtos por preço", "expected": "[data-test='product-sort-container']"},
-    {"id": "sauce-07", "split": "dev",  "action": "extract_text", "query": "Sauce Labs Backpack", "expected": "[data-test='inventory-item-name']:has-text('Backpack'), a:has([data-test='inventory-item-name']:has-text('Backpack'))"},
-    {"id": "sauce-08", "split": "test", "action": "extract_text", "query": "preço da jaqueta", "expected": "[data-test='inventory-item']:has-text('Fleece Jacket') [data-test='inventory-item-price']"}
+    {
+      "id": "sauce-01",
+      "split": "dev",
+      "action": "click",
+      "query": "botão para adicionar a mochila ao carrinho",
+      "expected": "[data-test='add-to-cart-sauce-labs-backpack']"
+    },
+    {
+      "id": "sauce-02",
+      "split": "test",
+      "action": "click",
+      "query": "adicionar a lanterna de bicicleta ao carrinho",
+      "expected": "[data-test='add-to-cart-sauce-labs-bike-light']"
+    },
+    {
+      "id": "sauce-03",
+      "split": "test",
+      "action": "click",
+      "query": "adicionar a camiseta vermelha",
+      "expected": "[data-test='add-to-cart-test.allthethings()-t-shirt-(red)']"
+    },
+    {
+      "id": "sauce-04",
+      "split": "dev",
+      "action": "click",
+      "query": "abrir o carrinho",
+      "expected": "[data-test='shopping-cart-link']"
+    },
+    {
+      "id": "sauce-05",
+      "split": "test",
+      "action": "click",
+      "query": "abrir o menu lateral",
+      "expected": "#react-burger-menu-btn"
+    },
+    {
+      "id": "sauce-06",
+      "split": "dev",
+      "action": "select",
+      "query": "ordenar produtos por preço",
+      "expected": "[data-test='product-sort-container']"
+    },
+    {
+      "id": "sauce-07",
+      "split": "dev",
+      "action": "extract_text",
+      "query": "Sauce Labs Backpack",
+      "expected": "[data-test='inventory-item-name']:has-text('Backpack'), a:has([data-test='inventory-item-name']:has-text('Backpack'))"
+    },
+    {
+      "id": "sauce-08",
+      "split": "test",
+      "action": "extract_text",
+      "query": "preço da jaqueta",
+      "expected": "[data-test='inventory-item']:has-text('Fleece Jacket') [data-test='inventory-item-price']"
+    }
   ]
 }

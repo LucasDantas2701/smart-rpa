@@ -117,7 +117,7 @@ def classify(status: str, rank: int | None, indexed: bool) -> str:
 
 
 def run_case(page: Page, suite: dict, case: dict) -> CaseResult:
-    resolver = ElementResolver(page)
+    resolver = ElementResolver(page, synonyms=suite.get("synonyms"))
     executor = ActionExecutor(page, resolver=resolver, k=MAX_K)
     resolver_action = RESOLVER_ACTION_MAP.get(case["action"], case["action"])
 

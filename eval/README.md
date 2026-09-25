@@ -27,6 +27,7 @@ Cada execução grava `results/<data>_<commit>.csv` (um caso por linha) e um `.j
 - `expected`: seletor CSS (ou do Playwright, como `:has-text()`) do elemento certo.
   Se mais de um elemento for aceitável, o seletor pode casar com vários.
 - `split`: `dev` para ajustar pesos e sinônimos; `test` só para medir.
+- `synonyms` (opcional, no nível do site): vocabulário específico, passado ao Resolver.
 
 ## Regra de ouro
 
