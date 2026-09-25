@@ -325,6 +325,9 @@ STRUCTURAL_WORDS = {
 ACTION_CONTENT_BONUS = 0.30
 ACTION_MISMATCH_DAMPING = 0.55
  
+ACTION_CONFLICT_DAMPING = 0.60   # elemento anuncia outro verbo
+DISABLED_DAMPING = 0.30          # elemento desabilitado (exceto extração)
+
 OBJECT_CONTEXT_BONUS = 0.30
 OBJECT_MISMATCH_DAMPING = 0.70
  

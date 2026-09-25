@@ -1,5 +1,7 @@
 from .constants import (
+    ACTION_CONFLICT_DAMPING,
     ACTION_CONTENT_BONUS,
+    DISABLED_DAMPING,
     ACTION_MISMATCH_DAMPING,
     ACTION_ROLE_WEIGHTS,
     OBJECT_CONTEXT_BONUS,
@@ -7,6 +9,7 @@ from .constants import (
     EXTRACT_TEXT_BONUS,
 )
 from .tokenizer import (
+    ACTION_WORDS_N,
     normalize_text,
     normalize_tokens,
     stem,
@@ -27,6 +30,7 @@ def score_element(
     tag: str,
     action: str | None = None,
     synonyms: dict[str, set[str]] | None = None,
+    state: dict | None = None,
 ) -> float:
     """
     Calcula a relevância de um elemento
@@ -124,13 +128,18 @@ def score_element(
 
     if object_query_tokens and action:
 
-        object_hits = (
-            object_query_tokens
+        # Cada token do objeto conta uma vez: o que já está no
+        # próprio elemento está coberto; o contexto só é consultado
+        # para o que faltar. Evita contar duas vezes o rótulo do
+        # elemento, que também aparece no texto do contexto.
+        own_hits = object_query_tokens & normalized_content_tokens
+        context_hits = (
+            (object_query_tokens - own_hits)
             & normalized_context_tokens
         )
 
         object_coverage = (
-            len(object_hits)
+            len(own_hits | context_hits)
             / len(object_query_tokens)
         )
 
@@ -242,6 +251,11 @@ def score_element(
         if action_coverage == 0.0:
             score *= ACTION_MISMATCH_DAMPING
 
+            # Verbo conflitante: o elemento anuncia OUTRA ação
+            # ("Add to cart" quando se pediu "abrir o carrinho").
+            if normalized_content_tokens & ACTION_WORDS_N:
+                score *= ACTION_CONFLICT_DAMPING
+
     # -------------------------------------------------
     # 8. Peso baseado no tipo de ação.
     # -------------------------------------------------
@@ -308,5 +322,18 @@ def score_element(
 
             if text_normalized == query_normalized:
                 score += 0.25
+
+    # -------------------------------------------------
+    # 10. Estado do elemento.
+    #
+    # Um elemento desabilitado não pode ser o alvo de
+    # uma interação (mas pode ser lido na extração).
+    # Elementos cobertos (obscured) NÃO são penalizados
+    # aqui: o alvo pode estar atrás de um modal, e o certo
+    # é fechar o modal, não escolher outro elemento.
+    # -------------------------------------------------
+
+    if state and state.get("disabled") and action != "extract":
+        score *= DISABLED_DAMPING
 
     return max(0.0, score)

@@ -222,16 +222,27 @@
         return textCache.get(node);
     };
 
+    const signature = (e) => e.tagName + "|" + e.className + "|" + innerTextOf(e).trim();
+
+    function hasTwin(container, el) {
+        const sig = signature(el);
+        for (const other of container.getElementsByTagName(el.tagName)) {
+            if (other !== el && signature(other) === sig) return true;
+        }
+        return false;
+    }
+
     function contextOf(el) {
         let container = null;
         for (const sel of CONTEXT) if ((container = el.closest(sel))) break;
 
-        // Fallback genérico: sobe até 5 níveis e fica com o MAIOR bloco que ainda cabe
-        // em 400 caracteres. Em listas de cards, isso para no card, antes da lista inteira.
+        // Fallback genérico: sobe até 5 níveis e fica com o maior bloco que ainda
+        // cabe em 400 caracteres. Para antes de um container que tenha um "gêmeo"
+        // do elemento (mesma tag, classe e texto): ali já é a lista, não o card.
         if (!container) {
             let p = el.parentElement;
             for (let i = 0; i < 5 && p && p !== document.body; i++, p = p.parentElement) {
-                if (innerTextOf(p).length > 400) break;
+                if (innerTextOf(p).length > 400 || hasTwin(p, el)) break;
                 container = p;
             }
         }

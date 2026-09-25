@@ -160,6 +160,7 @@ class ElementResolver:
                 action=action,
                 text=record["text"],
                 synonyms=self._synonyms,
+                state=record.get("state"),
             )
 
             match = Match(
