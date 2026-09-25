@@ -224,12 +224,32 @@
 
     const signature = (e) => e.tagName + "|" + e.className + "|" + innerTextOf(e).trim();
 
+    // Seletor do caminho de "container" até "el" (tags + classes), ex.:
+    // ":scope > div.card > h3 > a". Se ele casa com mais de um elemento,
+    // o container repete a mesma estrutura: é uma lista, não um card.
+    function structuralPath(container, el) {
+        const parts = [];
+        for (let n = el; n && n !== container; n = n.parentElement) {
+            const classes = n.classList.length
+                ? Array.from(n.classList, (c) => "." + CSS.escape(c)).join("")
+                : ":not([class])";   // "a" sem classe não é gêmeo de "a.logo"
+            parts.unshift(n.tagName.toLowerCase() + classes);
+        }
+        return ":scope > " + parts.join(" > ");
+    }
+
     function hasTwin(container, el) {
+        // Gêmeo idêntico (mesma tag, classe e texto) ...
         const sig = signature(el);
         for (const other of container.getElementsByTagName(el.tagName)) {
             if (other !== el && signature(other) === sig) return true;
         }
-        return false;
+        // ... ou gêmeo estrutural (mesmo caminho de tags e classes).
+        try {
+            return container.querySelectorAll(structuralPath(container, el)).length > 1;
+        } catch (e) {
+            return false;
+        }
     }
 
     function contextOf(el) {
@@ -245,8 +265,17 @@
                 if (innerTextOf(p).length > 400 || hasTwin(p, el)) break;
                 container = p;
             }
+
+            // Se o próprio pai já repete a estrutura (ex.: dois botões soltos
+            // num cabeçalho), ele ainda é o melhor contexto disponível.
+            const first = el.parentElement;
+            if (!container && first && first !== document.body && innerTextOf(first).length <= 400) {
+                container = first;
+            }
         }
-        return container ? clean(innerTextOf(container), 300).toLowerCase() : "";
+        // Texto original (sem minúsculas): o scoring normaliza por conta própria,
+        // e o desempate mostra o contexto ao usuário.
+        return container ? clean(innerTextOf(container), 300) : "";
     }
 
     function geometry(el) {
@@ -308,7 +337,7 @@
         ].filter(Boolean))].join(" ").toLowerCase();
 
         const record = {
-            id, tag, role, type, label, text, value, hint, href,
+            id, tag, role, type, label, text, value, hint, href, testId,
             state: stateOf(el, tag),
             context: contextOf(el),
             content,

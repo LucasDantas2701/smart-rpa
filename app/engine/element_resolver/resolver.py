@@ -90,6 +90,35 @@ class ElementResolver:
 
         return len(self._records)
 
+    @property
+    def records(self) -> list[dict]:
+        """Registros da última indexação (um por elemento)."""
+        return self._records
+
+    def to_match(self, record: dict, score: float = 0.0) -> Match:
+        """Converte um registro do index_script.js em Match."""
+        return Match(
+            id=record["id"],
+            tag=record["tag"],
+            role=record["role"],
+            label=record["label"],
+            text=record["text"],
+            content=record["content"],
+            context=record["context"],
+            rect=record["rect"],
+            score=score,
+            page=self.page,
+            type=record.get("type", ""),
+            value=record.get("value", ""),
+            hint=record.get("hint", ""),
+            href=record.get("href", ""),
+            test_id=record.get("testId", ""),
+            state=record.get("state", {}),
+            options=record.get("options", []),
+            in_viewport=record.get("inViewport", True),
+            obscured=record.get("obscured", False),
+        )
+
     def query(
         self,
         description: str,
@@ -167,26 +196,7 @@ class ElementResolver:
                 ),
             )
 
-            match = Match(
-                id=record["id"],
-                tag=record["tag"],
-                role=record["role"],
-                label=record["label"],
-                text=record["text"],
-                content=record["content"],
-                context=record["context"],
-                rect=record["rect"],
-                score=score,
-                page=self.page,
-                type=record.get("type", ""),
-                value=record.get("value", ""),
-                hint=record.get("hint", ""),
-                href=record.get("href", ""),
-                state=record.get("state", {}),
-                options=record.get("options", []),
-                in_viewport=record.get("inViewport", True),
-                obscured=record.get("obscured", False),
-            )
+            match = self.to_match(record, score)
 
             matches.append(match)
 

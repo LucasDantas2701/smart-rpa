@@ -21,6 +21,7 @@ class Match:
     value: str = ""
     hint: str = ""
     href: str = ""
+    test_id: str = ""
     state: dict = field(default_factory=dict)
     options: list = field(default_factory=list)
     in_viewport: bool = True

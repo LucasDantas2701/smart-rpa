@@ -15,10 +15,12 @@ KIND = {
 
 def describe(match: Match, number: int) -> CandidateView:
     name = match.label or match.text or match.hint or match.value or "(sem texto)"
-    near = match.context or ""
-    if name.lower() in near:
-        near = near.replace(name.lower(), "", 1)
-    near = " ".join(near.split())
+    near = " ".join((match.context or "").split())
+
+    # Tira o próprio nome do elemento do "perto de" (sem diferenciar maiúsculas).
+    start = near.lower().find(name.lower())
+    if start >= 0:
+        near = " ".join((near[:start] + near[start + len(name):]).split())
     if len(near) > 60:
         near = near[:57].rstrip() + "..."
     return CandidateView(

@@ -24,8 +24,9 @@ class ActionResult:
     candidates: Optional[list[Match]] = None
     error: Optional[str] = None
 
-    # Quem escolheu o elemento: "heuristic", "user" (desempate)
-    # ou "user_skipped" (o usuário pediu para pular o passo).
+    # Quem escolheu o elemento: "heuristic", "user" (desempate),
+    # "memory" (escolha anterior do usuário) ou "user_skipped"
+    # (o usuário pediu para pular o passo).
     resolved_by: str = "heuristic"
 
     def __bool__(self) -> bool:
