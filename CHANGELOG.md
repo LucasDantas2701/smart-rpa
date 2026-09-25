@@ -18,6 +18,11 @@ que quebram compatibilidade também sobem o MINOR.
 ### Adicionado
 - Número da versão no código (`app.__version__`), gravado também nos resultados da avaliação.
 - Este changelog.
+- Configuração do `isort` em `pyproject.toml`, para verificar a ordem dos imports.
+
+### Alterado
+- Imports padronizados (PEP 8): biblioteca padrão, terceiros e projeto, separados
+  por linha em branco e em ordem alfabética.
 
 ## [0.1.0] - 2026-09-25
 

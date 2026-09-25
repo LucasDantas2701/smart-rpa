@@ -1,6 +1,5 @@
 from pathlib import Path
 
-
 INDEX_SCRIPT_PATH = (
     Path(__file__).resolve().parent / "index_script.js"
 )

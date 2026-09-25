@@ -21,7 +21,7 @@ pytestmark = pytest.mark.skipif(
     reason="LinkedIn proíbe automação; defina SMART_RPA_LINKEDIN=1 para rodar",
 )
 
-from app.browser.browser import start_browser, close_browser
+from app.browser.browser import close_browser, start_browser
 from app.engine.action_executor import ActionExecutor
 
 

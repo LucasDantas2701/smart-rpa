@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 
+
 def is_logged_in(page: Page,logged_in_selector: str) -> bool:
 
     try:

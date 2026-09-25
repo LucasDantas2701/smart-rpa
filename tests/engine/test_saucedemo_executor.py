@@ -3,7 +3,6 @@ import pytest
 from app.engine.action_executor import ActionExecutor
 from app.engine.element_resolver import ElementResolver
 
-
 SAUCEDEMO_URL = "https://www.saucedemo.com"
 
 # Vocabulário específico do site. Antes ficava no constants.py

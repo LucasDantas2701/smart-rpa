@@ -1,0 +1,10 @@
+# Configuração das ferramentas de padronização do código.
+
+[tool.isort]
+# Ordem dos imports (PEP 8), com uma linha em branco entre os grupos:
+#   1. biblioteca padrão do Python
+#   2. bibliotecas de terceiros (playwright, pytest...)
+#   3. módulos do próprio projeto
+profile = "black"
+known_first_party = ["app", "eval", "tests", "examples"]
+line_length = 100

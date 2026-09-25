@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 
+
 def navigate(page: Page, url: str) -> None:
     page.goto(url)
 

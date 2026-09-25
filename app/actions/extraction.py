@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 
+
 def extract_text(page: Page, selector: str) -> str:
     return page.locator(selector).inner_text()
 

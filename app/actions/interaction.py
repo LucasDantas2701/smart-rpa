@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 
+
 def click(page: Page, selector: str) -> None:
     page.locator(selector).click()
 

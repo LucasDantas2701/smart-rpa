@@ -7,9 +7,9 @@ semântico está em app/main.py.
 
 from playwright.sync_api import Page
 
-from app.actions.navigation import navigate
-from app.actions.interaction import click
 from app.actions.extraction import extract_text
+from app.actions.interaction import click
+from app.actions.navigation import navigate
 from app.actions.wait import wait_for_element
 
 

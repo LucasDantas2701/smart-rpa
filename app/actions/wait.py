@@ -1,5 +1,6 @@
 from playwright.sync_api import Page
 
+
 def wait_for_element(page: Page,selector: str,timeout: int = 10000) -> None:
     page.locator(selector).wait_for(state="visible",timeout=timeout)
 

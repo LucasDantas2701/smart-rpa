@@ -174,6 +174,16 @@ pytest tests/engine -v
 Os testes em `tests/real_sites/` (LinkedIn) ficam desativados por padrão, porque os termos
 de uso do site proíbem automação.
 
+### Padrão dos imports
+
+Os imports seguem a PEP 8, em três grupos separados por uma linha em branco:
+biblioteca padrão, bibliotecas de terceiros e módulos do projeto. Antes de commitar:
+
+```bash
+isort --check-only app eval tests examples   # só verifica
+isort app eval tests examples                # corrige
+```
+
 ### Avaliação
 
 ```bash

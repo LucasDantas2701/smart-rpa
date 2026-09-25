@@ -1,4 +1,4 @@
-from playwright.sync_api import sync_playwright, BrowserContext, Playwright
+from playwright.sync_api import BrowserContext, Playwright, sync_playwright
 
 
 def start_browser(profile_path: str) -> tuple[Playwright, BrowserContext]:
