@@ -184,6 +184,9 @@ def score_element(
         "menuitem",
         "option",
         "spinbutton",
+        "searchbox",
+        "slider",
+        "clickable",
     }
 
     if role in interactive_roles:

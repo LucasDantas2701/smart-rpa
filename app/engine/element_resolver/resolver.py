@@ -1,8 +1,9 @@
+
 from typing import Callable
-
+ 
 from playwright.sync_api import Page
-
-from .constants import ACTION_WORDS, DEFAULT_SELECTOR
+ 
+from .constants import ACTION_WORDS
 from .loader import load_index_script
 from .match import Match
 from .scoring import score_element
@@ -11,15 +12,15 @@ from .tokenizer import (
     normalize_tokens,
     tokenize,
 )
-
-
+ 
+ 
 class ElementResolver:
     """
     Localiza elementos de uma página utilizando
     descrição em linguagem natural.
-
+ 
     Fluxo:
-
+ 
         página
           ↓
         index()
@@ -34,35 +35,53 @@ class ElementResolver:
           ↓
         Match
     """
-
+ 
     def __init__(
         self,
         page: Page,
-        selector: str = DEFAULT_SELECTOR,
         include_hidden: bool = False,
+        context_selectors: list[str] | None = None,
+        selector: str | None = None,
     ):
+        """
+        context_selectors:
+            Containers específicos de um site para o contexto
+            (ex.: [".inventory_item"]). Opcional: o script já
+            tem uma heurística genérica.
+ 
+        selector:
+            Seletor CSS fixo. Se informado, desliga a detecção
+            automática do script (use só para depuração).
+        """
+ 
         self.page = page
-        self.selector = selector
         self.include_hidden = include_hidden
+        self.context_selectors = context_selectors or []
+        self.selector = selector
+        self._script = load_index_script()
         self._records: list[dict] = []
-
-    def index(self) -> int:
+ 
+    def index(self, mode: str = "interactive") -> int:
         """
         Analisa a página e cria o índice de elementos.
+ 
+        mode:
+            "interactive": só elementos clicáveis/preenchíveis.
+            "content": interativos + elementos com texto (extração).
         """
-
-        index_script = load_index_script()
-
+ 
         self._records = self.page.evaluate(
-            index_script,
-            [
-                self.selector,
-                self.include_hidden,
-            ],
+            self._script,
+            {
+                "mode": mode,
+                "selector": self.selector,
+                "includeHidden": self.include_hidden,
+                "contextSelectors": self.context_selectors,
+            },
         )
-
+ 
         return len(self._records)
-
+ 
     def query(
         self,
         description: str,
@@ -74,34 +93,37 @@ class ElementResolver:
         """
         Procura elementos relacionados à descrição
         e retorna os melhores candidatos.
-
+ 
         action:
             click
             fill
             extract
-
+ 
         filter:
             Função opcional para filtrar candidatos.
         """
-
-        if not self._records:
-            self.index()
-
+ 
+        # Reindexa a cada consulta: a página pode ter mudado
+        # desde a última (navegação, re-render). Corrige o B2.
+        self.index(
+            "content" if action == "extract" else "interactive"
+        )
+ 
         query = description.lower().strip()
-
+ 
         query_tokens = tokenize(query)
-
+ 
         normalized_query_tokens = normalize_tokens(
             query_tokens
         )
-
+ 
         # Palavras de ação presentes na consulta.
         action_query_tokens = (
             normalized_query_tokens & ACTION_WORDS
             if action
             else set()
         )
-
+ 
         # Objetos relevantes da consulta.
         object_query_tokens = (
             extract_object_tokens(
@@ -111,11 +133,11 @@ class ElementResolver:
             if action
             else normalized_query_tokens
         )
-
+ 
         matches = []
-
+ 
         for record in self._records:
-
+ 
             score = score_element(
                 content=record["content"],
                 context=record["context"],
@@ -129,7 +151,7 @@ class ElementResolver:
                 action=action,
                 text=record["text"],
             )
-
+ 
             match = Match(
                 id=record["id"],
                 tag=record["tag"],
@@ -141,26 +163,34 @@ class ElementResolver:
                 rect=record["rect"],
                 score=score,
                 page=self.page,
+                type=record.get("type", ""),
+                value=record.get("value", ""),
+                hint=record.get("hint", ""),
+                href=record.get("href", ""),
+                state=record.get("state", {}),
+                options=record.get("options", []),
+                in_viewport=record.get("inViewport", True),
+                obscured=record.get("obscured", False),
             )
-
+ 
             matches.append(match)
-
+ 
         if filter:
             matches = [
                 match
                 for match in matches
                 if filter(match)
             ]
-
+ 
         matches = [
             match
             for match in matches
             if match.score >= threshold
         ]
-
+ 
         matches.sort(
             key=lambda match: match.score,
             reverse=True,
         )
-
+ 
         return matches[:k]

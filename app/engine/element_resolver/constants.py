@@ -3,44 +3,8 @@ import re
 TOKEN_RE = re.compile(
     r"[^a-z0-9à-ÿ]+"
 )
-DEFAULT_SELECTOR = ",".join([
-    "h1", "h2", "h3", "h4", "h5", "h6",
-    "a[href]",
-    "button",
-    "input",
-    "select",
-    "option",
-    "textarea",
-    "form",
-    "fieldset",
-    "legend",
-    "table", "tr", "td", "th",
-    "ul", "ol", "li",
-    "nav",
-    "header",
-    "footer",
-    "aside",
-    "section",
-    "article",
-    "dialog",
-    "details",
-    "summary",
-    "label",
-    "img",
-    "video",
-    "audio",
-    "iframe",
-    "progress",
-    "[role]",
-    "[contenteditable]",
-    "[tabindex]",
-    "[aria-label]",
-    "[aria-labelledby]",
-    "[data-testid]",
-    "[data-test]",
-    "[data-qa]",
-    "[data-cy]",
-])
+# DEFAULT_SELECTOR removido: o index_script.js detecta os elementos sozinho.
+
 
 # ---------------------------------------------------------------------------
 # Sinônimos PT -> EN (ações, e-commerce, navegação, formulários, conta, social)
@@ -386,6 +350,7 @@ ACTION_ROLE_WEIGHTS = {
         "tab": 0.10,
         "menuitem": 0.10,
         "switch": 0.10,
+        "clickable": 0.05,   # div/span com cursor:pointer (detectado pelo script)
         "div": -0.05,
         "span": -0.05,
         "p": -0.05,

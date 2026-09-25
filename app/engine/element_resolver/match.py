@@ -16,6 +16,16 @@ class Match:
     score: float
     page: Page = field(repr=False)
 
+    # Campos novos do index_script.js (opcionais para manter os testes com mock).
+    type: str = ""
+    value: str = ""
+    hint: str = ""
+    href: str = ""
+    state: dict = field(default_factory=dict)
+    options: list = field(default_factory=list)
+    in_viewport: bool = True
+    obscured: bool = False
+
     @property
     def locator(self) -> Locator:
         return self.page.locator(
@@ -34,6 +44,7 @@ class Match:
             f"score={self.score:.2f}, "
             f"role='{self.role}', "
             f"text='{self.text}', "
+            f"hint='{self.hint}', "
             f"context='{self.context}'"
             f")"
         )
