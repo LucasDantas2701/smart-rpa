@@ -36,6 +36,7 @@ from pathlib import Path
 
 from playwright.sync_api import Page, sync_playwright
 
+from app import __version__
 from app.engine.action_executor import ActionExecutor
 from app.engine.action_executor.constants import (
     DEFAULT_AMBIGUITY_GAP,
@@ -259,6 +260,7 @@ def save(results: list[CaseResult], summary: dict, args) -> Path:
         w.writeheader()
         w.writerows(asdict(r) for r in results)
     meta = {
+        "versao": __version__,
         "commit": git_commit(),
         "data": datetime.now().isoformat(timespec="seconds"),
         "filtros": {"split": args.split, "site": args.site, "offline": args.offline},
