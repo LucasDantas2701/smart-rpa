@@ -1,0 +1,18 @@
+{
+  "versao": "0.2.0-dev",
+  "commit": "298e291",
+  "data": "2026-09-25T17:16:35",
+  "contexto_da_pagina": true,
+  "resumo": {
+    "referencia": {
+      "tarefas": 12,
+      "sucesso": 1.0,
+      "plano_valido": 1.0,
+      "verificacoes": 1.0,
+      "recusas_heuristica": 0,
+      "segundos_medio": 0.0,
+      "tokens_medio": 0,
+      "tentativas_medio": 1
+    }
+  }
+}

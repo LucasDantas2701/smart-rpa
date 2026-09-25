@@ -14,7 +14,15 @@ KIND = {
 
 
 def describe(match: Match, number: int) -> CandidateView:
-    name = match.label or match.text or match.hint or match.value or "(sem texto)"
+    # Sem rótulo, texto nem pista visual: o data-testid costuma ser descritivo
+    # ("shopping-cart-link" → "shopping cart link").
+    test_id = " ".join(match.test_id.replace("-", " ").replace("_", " ").split())
+    name = match.label or match.text or match.hint or match.value or test_id or "(sem texto)"
+
+    # Texto curto demais para identificar o elemento (ex.: o contador "2" do
+    # carrinho): junta a pista visual do ícone ("shopping cart 2").
+    if match.hint and name == match.text and len(name) <= 3:
+        name = f"{match.hint} {name}"
     near = " ".join((match.context or "").split())
 
     # Tira o próprio nome do elemento do "perto de" (sem diferenciar maiúsculas).

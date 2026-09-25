@@ -20,7 +20,21 @@ que quebram compatibilidade também sobem o MINOR.
 - Este changelog.
 - Configuração do `isort` em `pyproject.toml`, para verificar a ordem dos imports.
 
+- Planejador (`app/planner`): transforma o pedido do usuário em passos com um LLM,
+  no formato da API da OpenAI (funciona com a OpenAI e com modelos locais do Ollama).
+  Saída JSON validada contra as ações do Executor, com nova tentativa quando o plano
+  é inválido, e lista dos elementos da página no pedido ao modelo. Descarta o raciocínio
+  de modelos "thinking" (`<think>...</think>`) e aceita parâmetros extras por perfil.
+- Perfis de modelo em `llm_profiles.json` (endereço, modelo e o nome da variável de
+  ambiente com a chave; nunca a chave em si).
+- Comando `python -m app.planner` para gerar e executar um plano a partir de um pedido e um link.
+- Avaliação de tarefas completas (`eval/plan_run.py`, 12 tarefas em `eval/plans/tasks.json`):
+  pedido → plano → execução → verificação do estado final, com tempo e tokens por modelo,
+  e planos de referência escritos à mão como teto.
+
 ### Alterado
+- O nome dos elementos no desempate e no resumo da página usa a pista visual quando o
+  texto é curto demais (ex.: "shopping cart 2") e o `data-testid` quando não há outro nome.
 - Imports padronizados (PEP 8): biblioteca padrão, terceiros e projeto, separados
   por linha em branco e em ordem alfabética.
 

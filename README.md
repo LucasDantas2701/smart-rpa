@@ -91,12 +91,13 @@ passos são escritos à mão.
 * [x] **Avaliação reproduzível**: casos de desenvolvimento e um conjunto de teste fechado
   (holdout), com métricas atreladas ao commit.
 * [x] Perfis persistentes do navegador e detecção de login.
+* [x] **Planejador** (em desenvolvimento, versão 0.2.0): um LLM transforma o pedido
+  do usuário em passos, usando os nomes dos elementos da página. Funciona com a API da
+  OpenAI e com modelos locais do Ollama.
 
 ### Ainda não implementado
 
-* [ ] Planejador: LLM que transforma o pedido do usuário em passos.
 * [ ] Loop do agente, com replanejamento quando a página não bate com o plano.
-* [ ] Abstração de provedores de LLM (ChatGPT, Gemini, Claude).
 * [ ] Automações salvas, com dados próprios.
 * [ ] Confirmação humana antes de ações sensíveis.
 * [ ] Frontend (hoje a interação é pelo terminal).
@@ -184,6 +185,41 @@ isort --check-only app eval tests examples   # só verifica
 isort app eval tests examples                # corrige
 ```
 
+### Planejador (LLM)
+
+Os modelos ficam em `llm_profiles.json`, um perfil por modelo. O arquivo nunca guarda
+chaves: `api_key_env` é o nome da variável de ambiente onde a chave está.
+
+**Modelos locais (Ollama, grátis):** instale o [Ollama](https://ollama.com), baixe os modelos
+e coloque os nomes exatos (veja com `ollama list`) nos perfis `ollama-pequeno` e `ollama-medio`:
+
+```bash
+ollama pull <modelo-pequeno>
+ollama pull <modelo-medio>
+```
+
+**OpenAI (pago):** crie uma chave na plataforma de desenvolvedores da OpenAI (a assinatura do
+ChatGPT não dá acesso à API), guarde-a numa variável de ambiente e preencha o modelo no
+perfil `openai`:
+
+```bash
+setx OPENAI_API_KEY "sua-chave"        # Windows; abra um terminal novo depois
+```
+
+Gerar um plano, e executá-lo no navegador:
+
+```bash
+python -m app.planner --perfil ollama-pequeno --url eval/fixtures/cadastro.html "cadastre a Maria Silva no departamento de TI"
+python -m app.planner --perfil ollama-pequeno --url eval/fixtures/cadastro.html "cadastre a Maria Silva no departamento de TI" --executar
+```
+
+Comparar os modelos em tarefas completas (pedido → plano → execução → estado final):
+
+```bash
+python -m eval.plan_run --referencia                                    # planos escritos à mão (teto)
+python -m eval.plan_run --perfis ollama-pequeno ollama-medio openai -v  # os três modelos
+```
+
 ### Avaliação
 
 ```bash
@@ -218,6 +254,7 @@ smart-rpa/
 ├── app/
 │   ├── main.py                    # exemplo de ponta a ponta no SauceDemo
 │   ├── browser/                   # perfis persistentes, sessão e login
+│   ├── planner/                   # LLM: pedido → passos (perfis, validação, execução)
 │   ├── engine/
 │   │   ├── element_resolver/      # percepção (index_script.js) + ranqueamento
 │   │   ├── action_executor/       # validação e execução das ações
@@ -225,13 +262,14 @@ smart-rpa/
 │   │   └── memory/                # memória das escolhas + comando de revisão
 │   ├── actions/                   # ações de baixo nível por seletor (legado)
 │   └── automation/saucedemo.py    # exemplo LEGADO com seletores fixos (o "antes")
-├── eval/                          # avaliação: páginas, casos, resultados e holdout
+├── eval/                          # avaliação: páginas, casos, resultados, holdout e tarefas (plans/)
 ├── examples/                      # demonstrações
 ├── tests/
 │   ├── engine/                    # testes do motor
 │   └── real_sites/                # exploratórios, desativados por padrão
 ├── profiles/                      # perfis do navegador (fora do Git)
-└── memory/                        # escolhas memorizadas (fora do Git)
+├── memory/                        # escolhas memorizadas (fora do Git)
+└── llm_profiles.json              # perfis dos modelos de LLM (sem chaves)
 ```
 
 ## Sessões persistentes

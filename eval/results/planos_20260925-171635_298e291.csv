@@ -1,0 +1,13 @@
+perfil,modelo,tarefa,split,plano_valido,passos_plano,passos_ok,parou_em,verificacoes_ok,verificacoes,sucesso,segundos,tokens_entrada,tokens_saida,tentativas,erro,plano
+referencia,referencia,p-cad-01,dev,True,7,7,,7,7,True,0.0,0,0,1,,"[[""fill"", ""campo Nome completo"", ""Maria Silva""], [""fill"", ""campo CPF"", ""123.456.789-00""], [""fill"", ""campo E-mail corporativo"", ""maria.silva@empresa.com""], [""select"", ""lista Departamento"", ""TI""], [""check"", ""opção PJ"", null], [""check"", ""caixa Li e aceito os termos de uso"", null], [""click"", ""botão Salvar cadastro"", null]]"
+referencia,referencia,p-cad-02,dev,True,2,2,,2,2,True,0.0,0,0,1,,"[[""fill"", ""campo Telefone"", ""(92) 99999-0000""], [""fill"", ""campo Observações"", ""começa na segunda-feira""]]"
+referencia,referencia,p-log-01,dev,True,3,3,,4,4,True,0.0,0,0,1,,"[[""fill"", ""campo Username"", ""lucas.dantas""], [""check"", ""caixa Remember me"", null], [""click"", ""botão Log in"", null]]"
+referencia,referencia,p-log-02,dev,True,1,1,,1,1,True,0.0,0,0,1,,"[[""select"", ""lista Language"", ""Português""]]"
+referencia,referencia,p-loja-01,dev,True,1,1,,1,1,True,0.0,0,0,1,,"[[""select"", ""lista Sort by"", ""Price: low to high""]]"
+referencia,referencia,p-loja-02,dev,True,2,2,,3,3,True,0.0,0,0,1,,"[[""click"", ""botão Add to cart do UltraBook 14"", null], [""click"", ""botão Add to cart do QuietMax Headphones"", null]]"
+referencia,referencia,p-loja-03,dev,True,2,2,,2,2,True,0.0,0,0,1,,"[[""fill"", ""campo de busca Search products"", ""teclado mecânico""], [""click"", ""botão Search"", null]]"
+referencia,referencia,p-usr-01,dev,True,1,1,,1,1,True,0.0,0,0,1,,"[[""select"", ""lista Filtrar por status"", ""Inativos""]]"
+referencia,referencia,p-usr-02,dev,True,2,2,,3,3,True,0.0,0,0,1,,"[[""check"", ""caixa Selecionar Ana Souza"", null], [""check"", ""caixa Selecionar Carla Mendes"", null]]"
+referencia,referencia,p-usr-03,dev,True,1,1,,3,3,True,0.0,0,0,1,,"[[""click"", ""botão Excluir do Bruno Lima"", null]]"
+referencia,referencia,p-ped-01,dev,True,1,1,,1,1,True,0.0,0,0,1,,"[[""click"", ""botão Cancelar pedido do Pedido #1024"", null]]"
+referencia,referencia,p-ped-02,dev,True,2,2,,2,2,True,0.0,0,0,1,,"[[""click"", ""botão Adicionar ao carrinho da Caneca de cerâmica"", null], [""click"", ""link shopping cart link"", null]]"

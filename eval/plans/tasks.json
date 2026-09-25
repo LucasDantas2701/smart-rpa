@@ -1,0 +1,280 @@
+{
+  "_leia": "Tarefas completas para comparar planejadores. 'checks' são expressões JS que devem ser verdadeiras no fim; __clicked(seletor) e __entered(seletor) dizem se houve clique ou Enter no elemento. 'reference' é o plano escrito à mão (teto com planejador perfeito).",
+  "tasks": [
+    {
+      "id": "p-cad-01",
+      "split": "dev",
+      "fixture": "cadastro.html",
+      "request": "Cadastre a colaboradora Maria Silva, CPF 123.456.789-00, e-mail maria.silva@empresa.com, departamento de TI, contrato PJ. Aceite os termos e salve o cadastro.",
+      "checks": [
+        "document.querySelector('#nome').value === 'Maria Silva'",
+        "document.querySelector('#cpf').value === '123.456.789-00'",
+        "document.querySelector('#mail').value === 'maria.silva@empresa.com'",
+        "document.querySelector('#dep').selectedOptions[0].text === 'TI'",
+        "document.querySelector('input[value=pj]').checked",
+        "document.querySelector('#termos').checked",
+        "__clicked('button.save')"
+      ],
+      "reference": [
+        [
+          "fill",
+          "campo Nome completo",
+          "Maria Silva"
+        ],
+        [
+          "fill",
+          "campo CPF",
+          "123.456.789-00"
+        ],
+        [
+          "fill",
+          "campo E-mail corporativo",
+          "maria.silva@empresa.com"
+        ],
+        [
+          "select",
+          "lista Departamento",
+          "TI"
+        ],
+        [
+          "check",
+          "opção PJ",
+          null
+        ],
+        [
+          "check",
+          "caixa Li e aceito os termos de uso",
+          null
+        ],
+        [
+          "click",
+          "botão Salvar cadastro",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-cad-02",
+      "split": "dev",
+      "fixture": "cadastro.html",
+      "request": "Coloque o telefone (92) 99999-0000 e escreva nas observações: começa na segunda-feira",
+      "checks": [
+        "document.querySelector('#tel').value === '(92) 99999-0000'",
+        "document.querySelector('#obs').value.toLowerCase().includes('segunda')"
+      ],
+      "reference": [
+        [
+          "fill",
+          "campo Telefone",
+          "(92) 99999-0000"
+        ],
+        [
+          "fill",
+          "campo Observações",
+          "começa na segunda-feira"
+        ]
+      ]
+    },
+    {
+      "id": "p-log-01",
+      "split": "dev",
+      "fixture": "login.html",
+      "request": "Entre com o usuário lucas.dantas marcando lembrar de mim",
+      "checks": [
+        "document.querySelector('#user').value === 'lucas.dantas'",
+        "document.querySelector('input[name=remember]').checked",
+        "__clicked('#login-btn')",
+        "document.querySelector('#pwd').value === ''"
+      ],
+      "reference": [
+        [
+          "fill",
+          "campo Username",
+          "lucas.dantas"
+        ],
+        [
+          "check",
+          "caixa Remember me",
+          null
+        ],
+        [
+          "click",
+          "botão Log in",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-log-02",
+      "split": "dev",
+      "fixture": "login.html",
+      "request": "Troque o idioma da página para português",
+      "checks": [
+        "document.querySelector('select[name=lang]').selectedOptions[0].text === 'Português'"
+      ],
+      "reference": [
+        [
+          "select",
+          "lista Language",
+          "Português"
+        ]
+      ]
+    },
+    {
+      "id": "p-loja-01",
+      "split": "dev",
+      "fixture": "loja.html",
+      "request": "Ordene os produtos do mais barato para o mais caro",
+      "checks": [
+        "document.querySelector(\"select[aria-label='Sort by']\").selectedOptions[0].text === 'Price: low to high'"
+      ],
+      "reference": [
+        [
+          "select",
+          "lista Sort by",
+          "Price: low to high"
+        ]
+      ]
+    },
+    {
+      "id": "p-loja-02",
+      "split": "dev",
+      "fixture": "loja.html",
+      "request": "Coloque o UltraBook e os fones de ouvido no carrinho",
+      "checks": [
+        "__clicked('.card:nth-of-type(1) .add')",
+        "__clicked('.card:nth-of-type(2) .add')",
+        "!__clicked('.card:nth-of-type(3) .add')"
+      ],
+      "reference": [
+        [
+          "click",
+          "botão Add to cart do UltraBook 14",
+          null
+        ],
+        [
+          "click",
+          "botão Add to cart do QuietMax Headphones",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-loja-03",
+      "split": "dev",
+      "fixture": "loja.html",
+      "request": "Procure por teclado mecânico",
+      "checks": [
+        "/teclado|keyboard/i.test(document.querySelector('input[name=q]').value)",
+        "__clicked(\"header button[aria-label=Search]\") || __entered('input[name=q]')"
+      ],
+      "reference": [
+        [
+          "fill",
+          "campo de busca Search products",
+          "teclado mecânico"
+        ],
+        [
+          "click",
+          "botão Search",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-usr-01",
+      "split": "dev",
+      "fixture": "usuarios.html",
+      "request": "Mostre só os usuários inativos",
+      "checks": [
+        "document.querySelector(\"select[aria-label='Filtrar por status']\").selectedOptions[0].text === 'Inativos'"
+      ],
+      "reference": [
+        [
+          "select",
+          "lista Filtrar por status",
+          "Inativos"
+        ]
+      ]
+    },
+    {
+      "id": "p-usr-02",
+      "split": "dev",
+      "fixture": "usuarios.html",
+      "request": "Selecione a Ana e a Carla na lista",
+      "checks": [
+        "document.querySelector(\"input[aria-label='Selecionar Ana Souza']\").checked",
+        "document.querySelector(\"input[aria-label='Selecionar Carla Mendes']\").checked",
+        "!document.querySelector(\"input[aria-label='Selecionar Bruno Lima']\").checked"
+      ],
+      "reference": [
+        [
+          "check",
+          "caixa Selecionar Ana Souza",
+          null
+        ],
+        [
+          "check",
+          "caixa Selecionar Carla Mendes",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-usr-03",
+      "split": "dev",
+      "fixture": "usuarios.html",
+      "request": "Exclua o usuário Bruno Lima",
+      "checks": [
+        "__clicked('tbody tr:nth-child(2) button[title=Excluir]')",
+        "!__clicked('tbody tr:nth-child(1) button[title=Excluir]')",
+        "!__clicked('tbody tr:nth-child(3) button[title=Excluir]')"
+      ],
+      "reference": [
+        [
+          "click",
+          "botão Excluir do Bruno Lima",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-ped-01",
+      "split": "dev",
+      "fixture": "pedidos.html",
+      "request": "Cancele o pedido que ainda está em separação",
+      "checks": [
+        "__clicked('.pedido:nth-of-type(2) .cancel')"
+      ],
+      "reference": [
+        [
+          "click",
+          "botão Cancelar pedido do Pedido #1024",
+          null
+        ]
+      ]
+    },
+    {
+      "id": "p-ped-02",
+      "split": "dev",
+      "fixture": "pedidos.html",
+      "request": "Coloque a caneca de cerâmica no carrinho e depois abra o carrinho",
+      "checks": [
+        "__clicked('.rec:nth-of-type(2) button')",
+        "__clicked('a.cart')"
+      ],
+      "reference": [
+        [
+          "click",
+          "botão Adicionar ao carrinho da Caneca de cerâmica",
+          null
+        ],
+        [
+          "click",
+          "link shopping cart link",
+          null
+        ]
+      ]
+    }
+  ]
+}
