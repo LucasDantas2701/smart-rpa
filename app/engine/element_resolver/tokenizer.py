@@ -22,6 +22,7 @@ import unicodedata
 from functools import lru_cache
 
 from .constants import (
+    ACTION_EQUIVALENTS,
     ACTION_WORDS,
     STOPWORDS,
     STRUCTURAL_WORDS,
@@ -135,6 +136,17 @@ SYNONYMS_N = build_synonyms(SYNONYMS)
 ACTION_WORDS_N = {stem(_basic(w)) for w in ACTION_WORDS if " " not in w}
 STOPWORDS_N = {stem(_basic(w)) for w in STOPWORDS}
 STRUCTURAL_WORDS_N = {stem(_basic(w)) for w in STRUCTURAL_WORDS}
+
+_EQUIV_N = [{stem(w) for w in group} for group in ACTION_EQUIVALENTS]
+
+
+def expand_actions(actions: set[str]) -> set[str]:
+    """Inclui os verbos equivalentes (select → choose, pick...)."""
+    out = set(actions)
+    for group in _EQUIV_N:
+        if out & group:
+            out |= group
+    return out
 
 
 def normalize_tokens(

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>PeopleHub</title></head><body>
+<nav><a href="/" class="brand">PeopleHub</a> <a href="/payslips">Payslips</a> <a href="/benefits">Benefits</a>
+  <button aria-label="Account menu" class="acct"><img src="/assets/user-circle.svg" alt="" width="20" height="20"></button></nav>
+<section class="clock"><h2>Today</h2><p class="hours">Worked today: 3h 42m</p>
+  <button class="clock-in" disabled>Clock in</button><button class="clock-out">Clock out</button></section>
+<section class="leave"><h2>Request time off</h2>
+  <label for="ltype">Leave type</label><select id="ltype"><option>Vacation</option><option>Sick leave</option><option>Personal day</option></select>
+  <label for="start">Start date</label><input id="start" type="date">
+  <label for="end">End date</label><input id="end" type="date">
+  <label for="notes">Notes for your manager</label><textarea id="notes"></textarea>
+  <label><input type="checkbox" id="halfday"> Half day</label>
+  <button class="submit">Submit request</button></section>
+<section class="history"><h2>My requests</h2>
+  <ul>
+    <li class="r1">Vacation · Oct 12 – Oct 16 · <span class="st">Approved</span> <button class="cancel" disabled>Cancel</button></li>
+    <li class="r2">Personal day · Nov 3 · <span class="st">Pending</span> <button class="cancel">Cancel</button></li>
+  </ul>
+  <p class="balance">Vacation balance: 14 days</p></section>
+</body></html>

@@ -10,6 +10,7 @@ from .constants import (
 )
 from .tokenizer import (
     ACTION_WORDS_N,
+    expand_actions,
     normalize_text,
     normalize_tokens,
     stem,
@@ -31,6 +32,7 @@ def score_element(
     action: str | None = None,
     synonyms: dict[str, set[str]] | None = None,
     state: dict | None = None,
+    element_text: str | None = None,
 ) -> float:
     """
     Calcula a relevância de um elemento
@@ -253,7 +255,16 @@ def score_element(
 
             # Verbo conflitante: o elemento anuncia OUTRA ação
             # ("Add to cart" quando se pediu "abrir o carrinho").
-            if normalized_content_tokens & ACTION_WORDS_N:
+            # Os verbos vêm só do rótulo/texto/pistas do elemento,
+            # nunca do valor de um campo ("Selecione" num select).
+            element_verbs = normalize_tokens(
+                tokenize(element_text if element_text is not None else content),
+                synonyms,
+            ) & ACTION_WORDS_N
+
+            if element_verbs and not (
+                element_verbs & expand_actions(action_query_tokens)
+            ):
                 score *= ACTION_CONFLICT_DAMPING
 
     # -------------------------------------------------

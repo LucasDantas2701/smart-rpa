@@ -161,6 +161,10 @@ class ElementResolver:
                 text=record["text"],
                 synonyms=self._synonyms,
                 state=record.get("state"),
+                element_text=" ".join(
+                    record.get(key) or ""
+                    for key in ("label", "text", "hint")
+                ),
             )
 
             match = Match(

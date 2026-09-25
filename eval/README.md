@@ -44,3 +44,33 @@ olhando os casos de teste, o resultado deixa de medir generalização.
 | `recusa_evitavel` | o certo estava em 1º, mas o Executor recusou (limiar conservador) |
 | `recusa_correta` | o Executor recusou e o 1º estava errado (evitou um erro) |
 | `falha_percepcao` | o elemento certo nem foi indexado pelo `index_script.js` |
+
+## Holdout (conjunto de teste fechado)
+
+Os arquivos `cases/holdout_*.json` (split `test`) formam o conjunto fechado,
+criado em 25/09/2026 **antes** das correções de verbo conflitante e da
+recalibração dos limiares. Os casos do antigo split `test` viraram `dev`
+(campo `split_original: "test"`), porque já tinham sido consultados.
+
+Regras:
+
+1. `python -m eval.run` nunca roda o holdout. Só `--final` roda, e o
+   resultado sai com o sufixo `_FINAL` no nome do arquivo.
+2. Rode `--final` **uma vez**, quando o desenvolvimento do Resolver estiver
+   encerrado. Os números do artigo vêm dessa rodada.
+3. Se algo for alterado depois de olhar o holdout, registre isso no artigo.
+4. `--check` pode ser usado a qualquer momento: só confere se os seletores
+   esperados existem, sem calcular scores.
+
+### Consultas de colegas (recomendado)
+
+As consultas do holdout foram escritas pelo mesmo autor das heurísticas
+(viés de autoria). Para reduzir esse viés, peça a 2 ou 3 pessoas que:
+
+1. abram cada página de `fixtures/holdout_*.html` no navegador;
+2. escrevam, para 8 a 10 elementos, como pediriam aquela ação a um
+   assistente ("quero cancelar o pedido do dia 3 de novembro");
+3. sem ver o código nem os casos existentes.
+
+Adicione essas consultas como novos casos `split: "test"`, com ids
+`h-<pagina>-cNN`, e reporte os dois grupos separadamente no artigo.

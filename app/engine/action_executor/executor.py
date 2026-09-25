@@ -91,10 +91,11 @@ class ActionExecutor:
                 matches,
             )
 
+        # Margem relativa ao score do 1º colocado (ver constants.py).
         gap = (
             matches[0].score
             - matches[1].score
-        )
+        ) / matches[0].score
 
         if gap < self.ambiguity_gap:
             return (

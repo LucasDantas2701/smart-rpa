@@ -21,14 +21,14 @@
     },
     {
       "id": "sauce-02",
-      "split": "test",
+      "split": "dev", "split_original": "test",
       "action": "click",
       "query": "adicionar a lanterna de bicicleta ao carrinho",
       "expected": "[data-test='add-to-cart-sauce-labs-bike-light']"
     },
     {
       "id": "sauce-03",
-      "split": "test",
+      "split": "dev", "split_original": "test",
       "action": "click",
       "query": "adicionar a camiseta vermelha",
       "expected": "[data-test='add-to-cart-test.allthethings()-t-shirt-(red)']"
@@ -42,7 +42,7 @@
     },
     {
       "id": "sauce-05",
-      "split": "test",
+      "split": "dev", "split_original": "test",
       "action": "click",
       "query": "abrir o menu lateral",
       "expected": "#react-burger-menu-btn"
@@ -63,7 +63,7 @@
     },
     {
       "id": "sauce-08",
-      "split": "test",
+      "split": "dev", "split_original": "test",
       "action": "extract_text",
       "query": "preço da jaqueta",
       "expected": "[data-test='inventory-item']:has-text('Fleece Jacket') [data-test='inventory-item-price']"

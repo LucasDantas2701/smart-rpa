@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Posts — CMS</title>
+<style>[role=switch]{display:inline-block;width:30px;height:16px;background:#ccc;cursor:pointer}</style></head><body>
+<aside><a href="/posts" class="nav-posts">Posts</a> <a href="/media">Media library</a> <a href="/settings">Settings</a></aside>
+<main>
+  <div class="top"><h1>Posts</h1><button class="new">New post</button></div>
+  <table class="posts">
+    <tr class="p1"><td class="title">Quarterly results are in</td><td class="state">Published</td>
+      <td><a href="/posts/1/edit" class="edit">Edit</a> <a href="/posts/1" class="preview">Preview</a> <button class="del" title="Move to trash"><i class="fa fa-trash" style="display:inline-block;width:14px;height:14px"></i></button></td></tr>
+    <tr class="p2"><td class="title">Welcome our new interns</td><td class="state">Draft</td>
+      <td><a href="/posts/2/edit" class="edit">Edit</a> <a href="/posts/2" class="preview">Preview</a> <button class="del" title="Move to trash"><i class="fa fa-trash" style="display:inline-block;width:14px;height:14px"></i></button></td></tr>
+  </table>
+  <section class="editor">
+    <label for="ptitle">Title</label><input id="ptitle" value="Welcome our new interns">
+    <div class="body" contenteditable="true" aria-label="Post content">This summer we welcome five interns...</div>
+    <label for="tags">Tags</label><input id="tags" placeholder="Add tags separated by commas">
+    <span id="cmt-label">Allow comments</span><div role="switch" aria-checked="false" aria-labelledby="cmt-label" tabindex="0" class="comments"></div>
+    <button class="draft">Save draft</button><button class="publish">Publish</button>
+    <p class="edited">Last edited 2 hours ago by Ana</p>
+  </section>
+</main>
+</body></html>

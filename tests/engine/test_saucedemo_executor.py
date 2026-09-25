@@ -60,7 +60,6 @@ def test_add_backpack_to_cart(saucedemo_page):
     executor = ActionExecutor(
         saucedemo_page,
         resolver=ElementResolver(saucedemo_page, synonyms=SAUCEDEMO_VOCAB),
-        ambiguity_gap=0.08,
     )
 
     result = executor.click(
@@ -86,7 +85,6 @@ def test_find_backpack(saucedemo_page):
 
     executor = ActionExecutor(
         saucedemo_page,
-        ambiguity_gap=0.08,
     )
 
     result = executor.extract_text(

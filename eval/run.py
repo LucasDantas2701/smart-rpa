@@ -14,6 +14,12 @@ Uso (na raiz do projeto):
     python -m eval.run --offline        # pula sites reais
     python -m eval.run --site loja -v   # um site, mostrando cada caso
     python -m eval.run --sweep          # varre score mínimo × gap
+    python -m eval.run --check          # só confere os seletores esperados (inclui o holdout)
+    python -m eval.run --final          # roda o HOLDOUT (split "test"). Uma vez, no fim.
+
+O split "test" é o conjunto fechado (holdout): fica fora de todas as
+execuções, a menos que --final seja usado. Não olhe esses resultados
+durante o desenvolvimento.
 """
 
 from __future__ import annotations
@@ -67,6 +73,27 @@ class CaseResult:
 # ----------------------------------------------------------------------
 # Carregamento
 # ----------------------------------------------------------------------
+
+def check_selectors(suites: list[dict]) -> None:
+    """Confere se cada seletor esperado encontra elemento(s). Não calcula scores."""
+    problems = 0
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        for suite in suites:
+            page = browser.new_page()
+            open_suite(page, suite)
+            for case in suite["cases"]:
+                n = page.locator(case["expected"]).count()
+                if n == 0:
+                    problems += 1
+                    print(f"  [SEM ALVO] {case['id']}: {case['expected']}")
+                elif n > 1:
+                    print(f"  [aviso] {case['id']}: seletor casa com {n} elementos (todos aceitos)")
+            page.close()
+        browser.close()
+    total = sum(len(s["cases"]) for s in suites)
+    print(f"{total} casos conferidos, {problems} com seletor quebrado.")
+
 
 def load_suites(site: str | None, offline: bool) -> list[dict]:
     suites = []
@@ -175,11 +202,13 @@ def summarize(results: list[CaseResult]) -> dict:
 def sweep(results: list[CaseResult]) -> list[dict]:
     """Simula o Executor com outros limiares, usando os scores já calculados."""
     rows = []
-    for min_score in (0.10, 0.20, 0.30, 0.40, 0.50, 0.60):
-        for gap in (0.02, 0.05, 0.08, 0.12, 0.16, 0.20, 0.30):
+    for min_score in (0.15, 0.20, 0.30, 0.40, 0.50, 0.60):
+        for gap in (0.02, 0.04, 0.06, 0.08, 0.12, 0.16, 0.20, 0.30):
             ok = err = refused = 0
             for r in results:
-                decided = r.top1_score >= min_score and (r.top1_score - r.runner_up_score) >= gap
+                # Mesma regra do Executor: gap relativo ao score do 1º.
+                margin = (r.top1_score - r.runner_up_score) / r.top1_score if r.top1_score else 0.0
+                decided = r.top1_score >= min_score and margin >= gap
                 if not decided:
                     refused += 1
                 elif r.top1_is_target:
@@ -223,7 +252,8 @@ def git_commit() -> str:
 def save(results: list[CaseResult], summary: dict, args) -> Path:
     out = ROOT / "results"
     out.mkdir(exist_ok=True)
-    stem = f"{datetime.now():%Y%m%d-%H%M%S}_{git_commit()}"
+    tag = "_FINAL" if args.final else ""
+    stem = f"{datetime.now():%Y%m%d-%H%M%S}_{git_commit()}{tag}"
     with open(out / f"{stem}.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(asdict(results[0])))
         w.writeheader()
@@ -251,7 +281,19 @@ def main() -> None:
     ap.add_argument("--sweep", action="store_true", help="varre score mínimo × gap")
     ap.add_argument("-v", "--verbose", action="store_true", help="mostra cada caso")
     ap.add_argument("--headed", action="store_true")
+    ap.add_argument("--check", action="store_true", help="só confere os seletores esperados")
+    ap.add_argument("--final", action="store_true", help="roda o holdout (split test)")
     args = ap.parse_args()
+
+    if args.check:
+        check_selectors(load_suites(args.site, args.offline))
+        return
+
+    if args.split == "test" and not args.final:
+        ap.error('o split "test" é o holdout; use --final (uma vez, no fim do desenvolvimento)')
+    if args.final:
+        args.split = "test"
+        print("*** HOLDOUT: execução final. Registre a data e o commit desta rodada. ***")
 
     results: list[CaseResult] = []
     with sync_playwright() as p:
@@ -260,8 +302,11 @@ def main() -> None:
             page = browser.new_page()
             open_suite(page, suite)
             for case in suite["cases"]:
-                if args.split and case.get("split") != args.split:
+                split = case.get("split", "dev")
+                if args.split and split != args.split:
                     continue
+                if not args.split and split == "test":
+                    continue  # holdout fica fora por padrão
                 r = run_case(page, suite, case)
                 results.append(r)
                 if args.verbose:
@@ -288,7 +333,7 @@ def main() -> None:
 
     if args.sweep:
         print("\nVARREDURA DE LIMIARES (menor erro silencioso primeiro, depois maior acerto)")
-        print("  min_score   gap   acerto   erro silencioso   recusa")
+        print("  min_score   gap (relativo)   acerto   erro silencioso   recusa")
         rows = sorted(sweep(results), key=lambda x: (x["erro_silencioso"], -x["acerto"]))
         for row in rows[:12]:
             print(f"    {row['min_score']:.2f}     {row['gap']:.2f}   {pct(row['acerto'])}      "

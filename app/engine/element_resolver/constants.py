@@ -326,6 +326,19 @@ ACTION_CONTENT_BONUS = 0.30
 ACTION_MISMATCH_DAMPING = 0.55
  
 ACTION_CONFLICT_DAMPING = 0.60   # elemento anuncia outro verbo
+
+# Verbos que expressam a mesma intenção. Um elemento com um verbo
+# do mesmo grupo do pedido não é considerado "conflitante".
+ACTION_EQUIVALENTS = [
+    {"select", "choose", "pick"},
+    {"open", "view", "show", "expand"},
+    {"send", "submit", "confirm", "apply"},
+    {"delete", "remove"},
+    {"add", "include"},
+    {"edit", "update"},
+    {"login", "signin"},
+    {"search", "find"},
+]
 DISABLED_DAMPING = 0.30          # elemento desabilitado (exceto extração)
 
 OBJECT_CONTEXT_BONUS = 0.30
