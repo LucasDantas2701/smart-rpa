@@ -68,112 +68,161 @@ Encontra o botão correspondente
 
 ## Status do projeto
 
-🚧 **Em desenvolvimento / MVP**
-
-Atualmente, o projeto possui a base para execução de automações web utilizando Playwright.
+🚧 **Versão 0.1: motor de execução.** O sistema já executa passos descritos em
+linguagem natural numa página real, pergunta ao usuário quando não tem certeza
+e aprende com as respostas. O **planejador** (LLM que transforma o pedido do
+usuário em passos) e o **loop do agente** ainda não existem: por enquanto, os
+passos são escritos à mão.
 
 ### Implementado
 
-* [x] Integração com Playwright
-* [x] Perfil persistente do navegador
-* [x] Gerenciamento do ciclo de vida do navegador
-* [x] Detecção de sessão/login
-* [x] Ações de navegação
-* [x] Interação com elementos
-* [x] Extração de dados
-* [x] Esperas e sincronização
-* [x] Download de arquivos
-* [x] Capturas de tela
-* [x] Tratamento inicial de pop-ups
-* [x] Estrutura modular de ações
-* [x] Automação funcional utilizando o SauceDemo
+* [x] **Percepção da página** (`index_script.js`): indexa só os elementos interativos
+  (links, botões, campos, papéis ARIA e áreas clicáveis por `cursor: pointer`), com
+  nome acessível, pistas visuais de ícones, estado, contexto do card e geometria.
+  Entra em shadow DOM aberto.
+* [x] **Resolvedor de elementos** heurístico: normalização de texto (acentos, plurais,
+  expressões compostas), sinônimos PT→EN, vocabulário por site e scoring por ação.
+* [x] **Executor de ações**: click, hover, check, uncheck, press, fill, select e extrações,
+  com validação por score mínimo e margem relativa de ambiguidade.
+* [x] **Desempate pelo usuário**: quando a heurística não tem certeza, os candidatos são
+  numerados na página e o usuário escolhe no terminal, ou clica direto no elemento.
+* [x] **Memória das escolhas**: o que o usuário escolheu é reaproveitado nas próximas
+  execuções, com expiração automática e comando de revisão.
+* [x] **Avaliação reproduzível**: casos de desenvolvimento e um conjunto de teste fechado
+  (holdout), com métricas atreladas ao commit.
+* [x] Perfis persistentes do navegador e detecção de login.
 
-### Próximo foco
+### Ainda não implementado
 
-O próximo estágio é implementar o **Resolvedor de Elementos**, permitindo que a automação encontre elementos de maneira semântica em vez de depender exclusivamente de seletores definidos manualmente.
+* [ ] Planejador: LLM que transforma o pedido do usuário em passos.
+* [ ] Loop do agente, com replanejamento quando a página não bate com o plano.
+* [ ] Abstração de provedores de LLM (ChatGPT, Gemini, Claude).
+* [ ] Automações salvas, com dados próprios.
+* [ ] Confirmação humana antes de ações sensíveis.
+* [ ] Frontend (hoje a interação é pelo terminal).
 
-## Arquitetura
+## Como funciona hoje
+
+```text
+Passo em linguagem natural ("adicionar a mochila ao carrinho")
+        │
+        ▼
+Memória: o usuário já escolheu este elemento antes? ── sim ──► executa
+        │ não
+        ▼
+Percepção: indexa os elementos interativos da página (index_script.js)
+        │
+        ▼
+Resolvedor: ranqueia os candidatos pela descrição
+        │
+        ▼
+Validação: score mínimo e margem para o 2º colocado
+        │                              │
+     confiante                   ambíguo / não encontrado
+        │                              │
+        │                              ▼
+        │                 Usuário escolhe (número ou clique na página)
+        │                              │
+        │                              ▼
+        │                 Escolha guardada na memória
+        ▼                              ▼
+                Playwright executa a ação
+```
+
+## Como rodar
+
+Requisitos: Python 3.10 ou mais recente.
+
+```bash
+python -m venv venv
+venv\Scripts\activate            # Windows  (Linux/macOS: source venv/bin/activate)
+pip install -r requirements.txt
+playwright install chromium
+```
+
+### Exemplo no SauceDemo
+
+```bash
+python -m app.main
+```
+
+Na primeira execução, faça o login na janela do navegador
+(`standard_user` / `secret_sauce`). A sessão fica no perfil persistente.
+
+### Demonstração do desempate e da memória
+
+```bash
+python -m examples.desempate
+```
+
+Rode duas vezes: na primeira, o assistente pergunta; na segunda, usa as escolhas memorizadas.
+
+### Revisar o que o assistente aprendeu
+
+```bash
+python -m app.engine.memory memory/demo.json listar
+python -m app.engine.memory memory/demo.json esquecer 2
+python -m app.engine.memory memory/demo.json limpar
+```
+
+### Testes
+
+```bash
+pytest tests/engine -v
+```
+
+Os testes em `tests/real_sites/` (LinkedIn) ficam desativados por padrão, porque os termos
+de uso do site proíbem automação.
+
+### Avaliação
+
+```bash
+python -m eval.run -v            # casos de desenvolvimento (inclui o SauceDemo real)
+python -m eval.run --offline     # só as páginas locais
+python -m eval.run --sweep       # testa combinações de limiares
+python -m eval.run --check       # confere os seletores esperados, sem calcular scores
+```
+
+O conjunto de teste fechado (holdout) só roda com `--final`, uma única vez, no fim do
+desenvolvimento. Detalhes em [`eval/README.md`](eval/README.md).
+
+## Resultados atuais
+
+Conjunto de desenvolvimento, 60 casos em 7 páginas (6 locais e o SauceDemo), commit `0de5a8b`:
+
+| Métrica | Valor |
+|---|---|
+| Elemento certo em 1º (recall@1) | 83,3% |
+| Elemento certo entre os 5 primeiros (recall@5) | 90,0% |
+| Executor decide e acerta | 76,7% |
+| Executor decide e erra (erro silencioso) | 3,3% |
+| Executor recusa e pergunta ao usuário | 20,0% |
+
+Estes números medem a evolução durante o desenvolvimento, não a generalização: os casos foram
+consultados enquanto o código era ajustado. A generalização será medida no holdout.
+
+## Estrutura
 
 ```text
 smart-rpa/
-│
 ├── app/
-│   ├── agent/
-│   │   ├── agent.py
-│   │   ├── planner.py
-│   │   ├── executor.py
-│   │   ├── memory.py
-│   │   └── prompts/
-│   │       └── system_prompt.txt
-│   │
-│   ├── browser/
-│   │   ├── browser.py
-│   │   ├── session.py
-│   │   └── profile.py
-│   │
+│   ├── main.py                    # exemplo de ponta a ponta no SauceDemo
+│   ├── browser/                   # perfis persistentes, sessão e login
 │   ├── engine/
-│   │   ├── browser_engine.py
-│   │   ├── element_resolver.py
-│   │   └── action_executor.py
-│   │
-│   ├── actions/
-│   │   ├── navigation.py
-│   │   ├── interaction.py
-│   │   ├── extraction.py
-│   │   ├── download.py
-│   │   ├── wait.py
-│   │   ├── screenshot.py
-│   │   └── popups.py
-│   │
-│   ├── llm/
-│   │   ├── client.py
-│   │   ├── openai.py
-│   │   ├── gemini.py
-│   │   └── claude.py
-│   │
-│   ├── automation/
-│   │   └── example_task.py
-│   │
-│   ├── config/
-│   │   └── settings.py
-│   │
-│   └── main.py
-│
-├── profiles/
+│   │   ├── element_resolver/      # percepção (index_script.js) + ranqueamento
+│   │   ├── action_executor/       # validação e execução das ações
+│   │   ├── disambiguation/        # desempate pelo usuário (terminal; contrato para o frontend)
+│   │   └── memory/                # memória das escolhas + comando de revisão
+│   ├── actions/                   # ações de baixo nível por seletor (legado)
+│   └── automation/saucedemo.py    # exemplo LEGADO com seletores fixos (o "antes")
+├── eval/                          # avaliação: páginas, casos, resultados e holdout
+├── examples/                      # demonstrações
 ├── tests/
-├── requirements.txt
-├── .env
-├── .gitignore
-└── README.md
+│   ├── engine/                    # testes do motor
+│   └── real_sites/                # exploratórios, desativados por padrão
+├── profiles/                      # perfis do navegador (fora do Git)
+└── memory/                        # escolhas memorizadas (fora do Git)
 ```
-
-## Tecnologias
-
-* **Python**
-* **Playwright**
-* **RPA**
-* **Automação de navegadores**
-* **Agentes de IA**
-* **LLMs**
-* **Orquestração**
-* **Resolução semântica de elementos**
-
-## Automação do navegador
-
-O Playwright é utilizado como o motor responsável pelo controle do navegador.
-
-O projeto não pretende recriar um mecanismo de automação de navegadores do zero. O Playwright fornece a infraestrutura de baixo nível, enquanto o Smart RPA desenvolve as camadas de maior nível relacionadas à inteligência, resolução e orquestração.
-
-Essa separação permite que o projeto se concentre em:
-
-* Interpretação de intenções
-* Planejamento de tarefas
-* Resolução de elementos
-* Execução de ações
-* Recuperação de falhas
-* Memória de execução
-* Observabilidade
-* Adaptação a mudanças na interface
 
 ## Sessões persistentes
 
@@ -204,45 +253,14 @@ Reutilização da sessão
 
 Os perfis do navegador são ignorados pelo Git e não fazem parte do repositório.
 
-## Exemplo atual
+## Limitações conhecidas
 
-Uma automação pode utilizar as ações disponíveis no projeto:
+* O casamento de texto é por palavras, com um dicionário de sinônimos; não há semântica real.
+  Extração de dados ("o preço do produto X") é o ponto mais fraco.
+* Iframes e shadow DOM fechado não são lidos.
+* Quando a heurística erra com confiança (erro silencioso), o usuário não é consultado.
+* Execuções sem ninguém por perto param quando há ambiguidade, até a memória aprender.
 
-```python
-navigate(
-    page,
-    "https://www.saucedemo.com/inventory.html"
-)
+## Contexto
 
-click(
-    page,
-    '[data-test="add-to-cart-sauce-labs-backpack"]'
-)
-
-click(
-    page,
-    '[data-test="shopping-cart-link"]'
-)
-
-product_name = extract_text(
-    page,
-    ".inventory_item_name"
-)
-```
-
-Atualmente, os seletores ainda são definidos manualmente.
-
-O objetivo é evoluir para uma abordagem semântica, na qual a intenção possa ser descrita de maneira mais próxima da linguagem natural:
-
-```python
-click_element(
-    page,
-    "botão para adicionar a mochila ao carrinho"
-)
-```
-
-O sistema então seria responsável por encontrar o elemento correspondente.
-
-## Roadmap
-
-### Fase 1 —
+Projeto de TCC na Faculdade Matias Machline (Manaus-AM), de Lucas dos Santos Dantas.

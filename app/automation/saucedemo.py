@@ -1,3 +1,10 @@
+"""
+LEGADO: automação do SauceDemo com seletores fixos.
+
+Mantida como exemplo do "antes" (RPA tradicional). A versão com o motor
+semântico está em app/main.py.
+"""
+
 from playwright.sync_api import Page
 
 from app.actions.navigation import navigate
