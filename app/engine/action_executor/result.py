@@ -29,6 +29,11 @@ class ActionResult:
     # (o usuário pediu para pular o passo).
     resolved_by: str = "heuristic"
 
+    # Só para resolved_by == "memory": quão parecido o elemento da página
+    # é com o memorizado. Não é comparável ao score da heurística, por
+    # isso fica em campo separado (e score fica None).
+    similarity: Optional[float] = None
+
     def __bool__(self) -> bool:
         return self.status == "success"
 
@@ -51,11 +56,19 @@ class ActionResult:
             else:
                 label = ""
 
+            measure = (
+                f"similarity={self.similarity:.2f}"
+                if self.similarity is not None
+                else f"score={self.score:.2f}"
+                if self.score is not None
+                else "score=None"
+            )
+
             return (
                 f"ActionResult("
                 f"status='success', "
                 f"action='{self.action}', "
-                f"score={self.score:.2f}, "
+                f"{measure}, "
                 f"element='{label}'"
                 + (f", resolved_by='{self.resolved_by}'" if self.resolved_by != "heuristic" else "")
                 + f")"

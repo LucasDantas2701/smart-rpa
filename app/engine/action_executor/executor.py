@@ -161,9 +161,10 @@ class ActionExecutor:
 
         # 1. Memória: o usuário já escolheu este elemento antes?
         if self.memory is not None:
-            remembered = self._from_memory(url, description, action_name, resolver_action)
+            found = self._from_memory(url, description, action_name, resolver_action)
 
-            if remembered is not None:
+            if found is not None:
+                remembered, similarity = found
                 try:
                     value = fn(remembered)
                 except Exception as exc:
@@ -174,9 +175,9 @@ class ActionExecutor:
                         action=action_name,
                         description=description,
                         selected_element=remembered,
-                        score=remembered.score,
                         error=str(exc),
                         resolved_by="memory",
+                        similarity=similarity,
                     )
 
                 self.memory.mark_used(url, action_name, description)
@@ -185,9 +186,9 @@ class ActionExecutor:
                     action=action_name,
                     description=description,
                     selected_element=remembered,
-                    score=remembered.score,
                     value=value,
                     resolved_by="memory",
+                    similarity=similarity,
                 )
 
         # 2. Heurística (e, se ela recusar, o usuário).
@@ -302,7 +303,8 @@ class ActionExecutor:
         description: str,
         action_name: str,
         resolver_action: str,
-    ) -> Optional[Match]:
+    ) -> Optional[tuple[Match, float]]:
+        """Elemento memorizado na página atual, com a similaridade (0 = só pelo caminho CSS)."""
         entry = self.memory.lookup(url, action_name, description)
         if entry is None:
             return None
@@ -311,12 +313,12 @@ class ActionExecutor:
         found = self.memory.find(entry, self.resolver.records)
 
         if found.record is not None:
-            return self.resolver.to_match(found.record, score=found.similarity)
+            return self.resolver.to_match(found.record), found.similarity
 
         if found.css_path:
             match = self._from_css_path(found.css_path, entry.signature)
             if match is not None:
-                return match
+                return match, 0.0
 
         self.memory.mark_missed(url, action_name, description)
         return None

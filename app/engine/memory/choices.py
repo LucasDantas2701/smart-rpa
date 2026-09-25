@@ -165,6 +165,16 @@ class ChoiceMemory:
         if self.entries.pop(step_key(url, action, description), None):
             self.save()
 
+    def ordered(self) -> list[tuple[str, Entry]]:
+        """Entradas em ordem estável (da mais antiga para a mais nova), para numerar."""
+        return sorted(self.entries.items(), key=lambda kv: (kv[1].created, kv[0]))
+
+    def forget_key(self, key: str) -> bool:
+        if self.entries.pop(key, None) is None:
+            return False
+        self.save()
+        return True
+
     def clear(self) -> None:
         self.entries = {}
         self.save()
